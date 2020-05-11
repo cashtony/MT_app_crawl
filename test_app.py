@@ -84,7 +84,7 @@ def waimai_param():
     kwargs["__skts"] = str(int(time.time() * 1000))
     kwargs["wm_visitid"] = str(uuid.uuid4())
     kwargs["wm_dtype"] = userAgent[0]
-    kwargs["uuid"] = utm_content
+    kwargs["uuid"] = '450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490'
     kwargs["seq_id"] = random.randint(200, 1000)
     kwargs["header_agent"] = userAgent[1]
     kwargs["req_time"] = str(int(time.time() * 1000) - random.randint(20, 60))
@@ -98,5 +98,13 @@ kwargs = waimai_param()
 url_params = 'utm_medium=android&utm_content={IMEI}&utm_term=50304&utm_source={utm_source}&ci={ci}&utm_campaign=AwaimaiBwaimaiGhomepage&uuid={uuid}&__skck=6a375bce8c66a0dc293860dfa83833ef&__skts=1588918923023&__skua=d41d8cd98f00b204e9800998ecf8427e&__skno=fe6b0619-00da-4d99-bb0c-f941c911505a&__skcy=%2BdJGSuGINBHtCCH0H32hGnIbUe4%3D'
 params_dict = [{i.split('=')[0]:i.split('=')[1]} for i in url_params.split('&')]
 print(params_dict)
-def get_url_params():
+def get_url_params(url_params_str):
+    kwargs = waimai_param()
+    url_params_str.fomat(
+        IMEI=kwargs['utm_source'],
+        utm_source= kwargs['utm_source'],
+        ci = kwargs['ci'],
+
+
+    )
 
