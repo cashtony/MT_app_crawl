@@ -1,0 +1,50 @@
+rohr.min.js 文件
+
+3348行 ip.sign  sign生成
+
+ip.sign = ij(jx)
+
+jx = {areaId: "0"
+cateId: "11"
+cityName: "深圳"
+dinnerCountAttrId: ""
+optimusCode: "10"
+originUrl: "https://sz.meituan.com/meishi/c11/"
+page: "1"
+partner: "126"
+platform: "1"
+riskLevel: "1"
+sort: ""
+userId: ""
+uuid: "0f0502af-a9f9-46f1-9ca7-418a1f34bb39"}
+
+
+ck = ["areaId", "cateId", "cityName", "dinnerCountAttrId", "optimusCode", "originUrl", "page", "partner", "platform", "riskLevel", "sort", "userId", "uuid"]
+# ij函数
+以 & 拼接参数 进入下个函数 iI
+
+iI函数
+将 ij函数拼接的字符串 转换为json字符串 压缩 生成 数组 jc
+
+iD函数 参数 js数组
+3132行
+iH 创建新列表
+bs 获取js 数组长度
+dY = 0
+for 循环 每次+ 1 直到 循环次数等于长度
+循环一次 dy + 1 当 dy == 3时 变成0
+
+iE函数
+1.如果jc数组的类型是 string类型
+返回 字符串[当前索引]的 unicode 编码位置
+python ord实现
+ord(string[index])
+2.如果jc 是 array 类型
+返回 数组[当前索引]
+3.如果jc 是 Unit8Array
+返回 数组[当前索引]
+
+
+
+
+

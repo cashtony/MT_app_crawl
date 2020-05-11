@@ -1,0 +1,51 @@
+头
+__skua	d41d8cd98f00b204e9800998ecf8427e
+__skck	6a375bce8c66a0dc293860dfa83833ef
+__skts	1588858240388    会变 时间戳
+__skcy	0GcCEhld0pgljimH+dTGutRWdlQ=      会变
+__skno	e63d8530-9e25-4617-a877-9a785d35bbb6   会变
+Content-Type	application/x-www-form-urlencoded; charset=UTF-8
+User-Agent	Dalvik/2.1.0 (Linux; U; Android 6.0.1; Redmi Note 3 MIUI/6.10.13)
+Host	wmapi.meituan.com
+Accept-Encoding	gzip
+Content-Length	1414
+Connection	keep-alive
+
+
+data
+wm_logintoken
+request_id	0A921D65-6A0F-44BF-A780-6EF405C16174
+poilist_mt_cityid	30
+wm_actual_longitude	113946069
+wm_actual_latitude	22529630
+req_time	1588858239910 会变 时间戳
+last_wm_poi_id	0
+trace_tag	{"action":"click","src_page":"p_category","src_block":"b_filter_category","src_item_id":"910","tgt_page":"p_category","req_time":"1588858239916","extra":"{\"navigate_type\":910,\"category_code\":910,\"sub_category_code\":0,\"sort_code\":0}","tgt_block":"[\"b_poilist\"]"}
+wm_did	861735030994726
+userid	0
+wm_longitude	113946069
+wm_channel	1040
+poilist_wm_cityid	440300
+sort_type	0
+page_size	20
+push_token	dpshc20654e2afb01c20681baeffb8e61c55atpu
+load_type	1
+category_type	910
+navigate_type	910
+wm_appversion	5.3.4
+wm_latitude	22529630
+wm_mac	02:00:00:00:00:00
+waimai_sign	gWWktMzgrd8XPUBd9e5M5SugN8ZZYuD1dqBLtgKt7sk9MBUtc1OT6jFQer6hn4u/wTpLDAYfMv+nLy4MVWv3+aQCsGB6Nj7H9gpWnXdXYsPA6W5fpbETcVOVfW0pw//HfdKzznatW3kKOn73CoovHeubVGucCWPPoZMJer0OE+s=  重点
+longitude	113946069
+preload	0
+wm_ctype	android
+second_category_type	0
+wm_visitid	86caef21-2af3-45b2-b566-4b8bb74838c5
+seq_id	128
+wm_dversion	23_6.0.1
+wm_uuid	450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490
+wm_dtype	Redmi Note 3
+page_index	0
+latitude	22529630
+filter_type	0
+
