@@ -44,3 +44,5 @@ def rest_sign():
 if __name__ == '__main__':
 
     ij(parms_dict)
+    s = 'wm_logintoken=&request_id=FA2632FA-A081-44AD-9B41-CDF05EAEAC1E&poilist_mt_cityid=30&wm_actual_longitude=113944290&wm_actual_latitude=22548953&req_time=1588908453045&last_wm_poi_id=0&trace_tag={"src_page":"p_category","tgt_page":"p_category","tgt_block":"[\"b_poilist\"]"}&wm_did=861735030994726&userid=0&wm_longitude=113944290&wm_channel=1040&poilist_wm_cityid=440300&sort_type=0&page_size=20&push_token=dpshc20654e2afb01c20681baeffb8e61c55atpu&load_type=0&category_type=910&navigate_type=910&wm_appversion=5.3.4&wm_latitude=22548953&wm_mac=02:00:00:00:00:00&waimai_sign=A40VLS9qWssTnhY2X3K0V7pTFDDQ8U23wWi4wuvM9IgMRDxrsKYgP7xNktMfvQwY3AlTSHQmJR1ZZJA0Ha9hktpyhhuJjRnj4LVMtBIYTcQtuncnVOyizprMJMgyFRnk3JkxZQRsm48dErqz9ugsCUJnzucxxKTU1dW321jfYsE=&longitude=113944290&preload=1&wm_ctype=android&second_category_type=101792&wm_visitid=dd4c9aa5-5167-47d2-bdfe-bb18582a7fa4&seq_id=196&wm_dversion=23_6.0.1&wm_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490&wm_dtype=Redmi Note 3&page_index=0&latitude=22548953&filter_type=0&'
+    print(len(s))

@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 import base64
 import hashlib
 import hmac
@@ -13,9 +14,10 @@ from Crypto.Cipher import PKCS1_v1_5
 from urllib.parse import quote, unquote
 import requests
 
-url = "http://wmapi.meituan.com/api/v6/poi/filter?utm_medium=android&utm_content=861735030994726&utm_term=50304&utm_source=1040&ci=30&utm_campaign=AwaimaiBwaimaiGhomepage&uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490&__skck=6a375bce8c66a0dc293860dfa83833ef&__skts=1588918923023&__skua=d41d8cd98f00b204e9800998ecf8427e&__skno=fe6b0619-00da-4d99-bb0c-f941c911505a&__skcy=%2BdJGSuGINBHtCCH0H32hGnIbUe4%3D"
+url2 = "http://wmapi.meituan.com/api/v6/poi/filter?utm_medium=android&utm_content=861735030994726&utm_term=50304&utm_source=1040&ci=30&utm_campaign=AwaimaiBwaimaiGhomepage&uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490&__skck=6a375bce8c66a0dc293860dfa83833ef&__skts=1588918923023&__skua=d41d8cd98f00b204e9800998ecf8427e&__skno=fe6b0619-00da-4d99-bb0c-f941c911505a&__skcy=%2BdJGSuGINBHtCCH0H32hGnIbUe4%3D"
 
 payload2 = "wm_logintoken=&request_id=BA540C03-6113-49BE-B131-8101BC60B829&poilist_mt_cityid=30&wm_actual_longitude=113944290&wm_actual_latitude=22548953&req_time=1588918923085&last_wm_poi_id=0&wm_did=861735030994726&userid=0&wm_longitude=113944290&wm_channel=1040&poilist_wm_cityid=440300&sort_type=0&page_size=20&push_token=dpshc20654e2afb01c20681baeffb8e61c55atpu&load_type=3&category_type=0&navigate_type=0&wm_appversion=5.3.4&wm_latitude=22548953&wm_mac=02%3A00%3A00%3A00%3A00%3A00&longitude=113944290&wm_ctype=android&second_category_type=0&wm_visitid=dd4c9aa5-5167-47d2-bdfe-bb18582a7fa4&seq_id=330&wm_dversion=23_6.0.1&wm_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490&wm_dtype=Redmi%20Note%203&page_index=1&latitude=22548953&filter_type=0&trace_tag=%7B%22action%22%3A%22pull_up%22%2C%22src_page%22%3A%22p_homepage%22%2C%22src_block%22%3A%22b_pull_up%22%2C%22tgt_page%22%3A%22p_homepage%22%2C%22req_time%22%3A%221588918923084%22%2C%22tgt_block%22%3A%22%5B%5C%22b_poilist%5C%22%5D%22%7D&waimai_sign=LN8U%2BXv593P4s0z53Vr7a%2FvwvV%2BMymLlMK5nyERLRwGui17L6A7Lh3%2FAnIMwEBprBZHF2TLScn%2FukfPjCF3p87%2FVAqsVtcJn17BaP3%2FyAK3JMASPEKkSnPXEqkeKnvQH07ITgyCISe5L%2BvSgvRJnudyTiBcFUQhirMYkPwnsDzM%3D"
+
 headers = {
     # '__skua': 'd41d8cd98f00b204e9800998ecf8427e',
     # '__skck': '6a375bce8c66a0dc293860dfa83833ef',
@@ -26,13 +28,13 @@ headers = {
     'User-Agent': 'Dalvik/2.1.0 (Linux; U; Android 6.0.1; Redmi Note 3 MIUI/6.10.13)',
     'Host': 'wmapi.meituan.com',
     'Accept-Encoding': 'gzip',
-    'Content-Length': '1208',
+    # 'Content-Length': '1208',
     'Connection': 'keep-alive'
 }
 #
-response = requests.request("POST", url, headers=headers, data = payload2)
-response_json = json.loads(response.text)
-pprint(response_json)
+# response = requests.request("POST", url2, headers=headers, data = payload2)
+# response_json = json.loads(response.text)
+# pprint(response_json)
 
 
 def user_agent():
@@ -79,7 +81,7 @@ def waimai_param():
     kwargs["__skua"] = hashlib.md5(userAgent[1].encode()).hexdigest()
     kwargs["push_token"] = "dpsh" + hashlib.md5(
         str(int(time.time()) - random.randint(0, 999)).encode()).hexdigest() + "atpu"
-    kwargs["ci"] = random.randint(1, 64)
+    kwargs["ci"] = '30' #random.randint(1, 64)
     kwargs["request_id"] = str(uuid.uuid4()).upper()
     kwargs["wm_mac"] = "%20".join([
         "%3A".join(["%.2x" % random.randint(17, 254) for _ in range(6)])
@@ -131,11 +133,13 @@ def get_encrypt_body(url, body, paratem_type, index_key='/api', **kwargs):
 
 
 def get_waimai_sign(url, imei, timestamp, count, index_key='/api'):
+
     rsa_key = int('''12083981869016806625904160907021092817445343978719657636691758456108571763332438804479335640035355
                      12215860668516972633211372985530120569151471217981967569519070010305215906205405249960933023944218
                      52427157555311661120915880014829628140915206376203479818468758857955965652575963285609268917035335
                      146444958477161'''.replace('\n', '').replace(' ', ''))
     sign_string = "/".join([url[url.index(index_key):], imei, str(timestamp), str(count)])
+    print(sign_string)
     encrypt_result = b''
     length = len(sign_string)
     i2 = 0
@@ -167,18 +171,18 @@ def get_skcy(url, param, method='POST'):
 kwargs = waimai_param()
 url_params = 'utm_medium=android&utm_content={utm_content}&utm_term=50304&utm_source={utm_source}&ci={ci}&utm_campaign=AwaimaiBwaimaiGhomepage&uuid={uuid}&__skck={__skck}&__skts={__skts}&__skua={__skua}&__skno={__skno}' # &__skcy=%2BdJGSuGINBHtCCH0H32hGnIbUe4%3D'
 payload = 'wm_logintoken=&request_id=%(request_id)s&poilist_mt_cityid=30&wm_actual_longitude=113944290&wm_actual_latitude=22548953&req_time=%(req_time)s&last_wm_poi_id=0&wm_did=861735030994726&userid=0&wm_longitude=113944290&wm_channel=1040&poilist_wm_cityid=440300&sort_type=0&page_size=20&push_token=%(push_token)s&load_type=3&category_type=0&navigate_type=0&wm_appversion=5.3.4&wm_latitude=22548953&wm_mac=%(wm_mac)s&longitude=113944290&wm_ctype=android&second_category_type=0&wm_visitid=%(wm_visitid)s&seq_id=%(seq_id)s&wm_dversion=23_6.0.1&wm_uuid=%(uuid)s&wm_dtype=%(wm_dtype)s&page_index=1&latitude=22548953&filter_type=0' #&waimai_sign={waimai_sign}'
-url = 'http://wmapi.meituan.com/api/v6/poi/filter?'
+url = 'http://wmapi.meituan.com/api/v6/poi/filter'
 encrypt_body = get_encrypt_body(url, body=payload, paratem_type=url_params, index_key='/wmapi', **kwargs)
 
-raw_url = url  + encrypt_body[0] + '&__skcy={0}'.format(encrypt_body[2])
+raw_url = url + '?' + encrypt_body[0] + '&__skcy={0}'.format(encrypt_body[2])
 kwargs["__skcy"] = encrypt_body[2]
 headers["User-Agent"] = kwargs['header_agent'].format(kwargs['utm_content'])
-headers["Content-Length"] = str(len(encrypt_body[1]))
+# headers["Content-Length"] = str(len(encrypt_body[1]))
 # print(headers)
 # print(raw_url)
-print(encrypt_body[1])
-print(payload2)
-
-
+# print(encrypt_body[1])
+# print(len(encrypt_body[1]))
+# print(str(len(unquote(encrypt_body[1]))))
+pprint(headers)
 response = requests.post(url=raw_url,headers=headers,data=encrypt_body[1])
-print(response.text)
+pprint(response.text)
