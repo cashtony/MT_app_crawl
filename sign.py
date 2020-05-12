@@ -4,6 +4,8 @@ import zlib
 from gzip import GzipFile
 from io import StringIO
 from urllib import parse
+from urllib.parse import unquote, quote
+
 parms_dict = {'areaId': "0",
 'cateId': "11",
 'cityName': "深圳",

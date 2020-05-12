@@ -215,6 +215,7 @@ class meituan_encrypt:
                                                      index_key)
         request_parameter = paratem_type.format(**kwargs)
         post_parameter = body.format(**kwargs)
+
         encrypt_result = self.get_skcy(url, "&".join([request_parameter, post_parameter]))
         return request_parameter, post_parameter, encrypt_result
 
