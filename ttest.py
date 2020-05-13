@@ -3,6 +3,9 @@ from pprint import pprint
 
 import requests
 
+def pro(response):
+    return json.loads(response.content.decode())
+
 payload = 'geoType=2&mtWmPoiId=1112840116809435&source=shoplist&uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490&platform=3&partner=4&originUrl=https%3A%2F%2Fh5.waimai.meituan.com%2Fwaimai%2Fmindex%2Fmenu%3FdpShopId%3D%26mtShopId%3D1112840116809435%26utm_source%3Dwandoujia%26channel%3Dmtjj%26source%3Dshoplist%26initialLat%3D22.544568%26initialLng%3D113.949059%26actualLat%3D22.544568%26actualLng%3D113.949059&riskLevel=71&optimusCode=10&wm_latitude=22544568&wm_longitude=113949059&openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490'
 
 headers = {
@@ -33,7 +36,7 @@ payload = 'mtWmPoiId=1083746008377954&openh5_uuid=450940DF938B12BD8AAC598D8CF467
 ### 最简化参数  商品 用
 url = 'https://i.waimai.meituan.com/openh5/poi/food?_=1589277696918'
 
-payload = 'mtWmPoiId=1083746008377954&openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490'
+payload = 'mtWmPoiId=1026133317077150&openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490'
 
 # resp = requests.post(url,headers=headers,data=payload)
 # print(resp.text)
@@ -42,26 +45,34 @@ payload = 'mtWmPoiId=1083746008377954&openh5_uuid=450940DF938B12BD8AAC598D8CF467
 url = 'https://i.waimai.meituan.com/openh5/poi/comments?_=1589353892512'
 headers['Cookie'] = 'cityid=30; network=wifi; utm_medium=android; utm_term=1000000202; utm_content=861735030994726; _lxsdk_cuid=171f918eca2c8-0a4e8cc73bc7e7-7452c56-38400-171f918eca5c8; _lxsdk=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; _lxsdk_s=1720cdf3bd3-4f6-026-814%7C-1%7CNaN; w_actual_lat=22544568; w_actual_lng=113949059'
 
-payload = 'shopId=0&mtWmPoiId=1083746008377954&startIndex=0&platform=3&partner=4&originUrl=https%3A%2F%2Fh5.waimai.meituan.com%2Fwaimai%2Fmindex%2Fmenu%3FdpShopId%3D%26mtShopId%3D891876934366856%26utm_source%3Dwandoujia%26channel%3Dmtjj%26source%3Dshoplist%26initialLat%3D%26initialLng%3D%26actualLat%3D22.544568%26actualLng%3D113.949059&riskLevel=71&optimusCode=10&wm_latitude=22544568&wm_longitude=113949059&openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490'
+payload = 'shopId=0&mtWmPoiId=1026133317077150&startIndex=0&platform=3&partner=4&originUrl=https%3A%2F%2Fh5.waimai.meituan.com%2Fwaimai%2Fmindex%2Fmenu%3FdpShopId%3D%26mtShopId%3D891876934366856%26utm_source%3Dwandoujia%26channel%3Dmtjj%26source%3Dshoplist%26initialLat%3D%26initialLng%3D%26actualLat%3D22.544568%26actualLng%3D113.949059&riskLevel=71&optimusCode=10&openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490'
 # resp = requests.post(url,headers=headers,data=payload)
 # print(resp.text)
 
 ### 列表页 根据商品分类 手机请求 用
 url = 'https://i.waimai.meituan.com/openh5/channel/kingkongshoplist?_=1589286163907'
 
-payload = 'startIndex=0&navigateType=910&firstCategoryId=910&secondCategoryId=101792&geoType=2&platform=3&partner=4&originUrl=https%3A%2F%2Fh5.waimai.meituan.com%2Fwaimai%2Fmindex%2Fkingkong%3FnavigateType%3D910%26firstCategoryId%3D910%26secondCategoryId%3D910%26title%3D%25E7%25BE%258E%25E9%25A3%259F&riskLevel=71&optimusCode=10&wm_actual_latitude=22544568&wm_actual_longitude=113949059&openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490'
+payload = 'startIndex=0&navigateType=910&firstCategoryId=910&secondCategoryId=100321&geoType=2&platform=3&partner=4&originUrl=https://h5.waimai.meituan.com/waimai/mindex/kingkong?navigateType=910&firstCategoryId=910&secondCategoryId=910&title=%E7%BE%8E%E9%A3%9F&riskLevel=71&optimusCode=10&wm_actual_latitude=22544568&wm_actual_longitude=113949059&openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490'
 
 headers['Cookie'] = 'cityid=30; network=wifi; uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; utm_medium=android; utm_content=861735030994726; w_actual_lat=22544568; w_actual_lng=113949059'
 
-# resp = requests.post(url,headers=headers,data=payload)
-# pprint(resp.text)
+resp = requests.post(url,headers=headers,data=payload)
+json_resp = pro(resp)
+pprint(json_resp)
+# 是否有下一页
+has_next_page = json_resp['data']['poiHasNextPage']
+# 店铺列表
+for shop in json_resp['data']['shopList']:
+    shopName = shop['shopName']
+
+
 
 ### 列表页 根据位置距离 手机请求
 url = 'https://i.waimai.meituan.com/openh5/homepage/poilist?_=1589358865578'
 headers['Cookie'] = 'cityid=30; network=wifi; utm_medium=android; utm_term=1000000202; utm_content=861735030994726; au_trace_key_net=default; terminal=i; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024; w_actual_lat=22544568; w_actual_lng=113949059'
 payload = 'startIndex=1&sortId=5&geoType=2&platform=3&partner=4&originUrl=https%3A%2F%2Fh5.waimai.meituan.com%2Fwaimai%2Fmindex%2Fhome%3Ftype%3Dmain_page%26channel%3Dmtjj%26utm_source%3D60374%26f%3Dandroid%26lat%3D22.547581662624406%26lng%3D113.94418152492057%26utm_medium%3Dandroid%26utm_term%3D1000000202%26version_name%3D10.0.202%26utm_content%3D861735030994726%26utm_campaign%3DAgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024%26ci%3D30%26msid%3D8617350309947261589353838250%26uuid%3D450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490%26userid%3D-1&riskLevel=71&optimusCode=10&wm_latitude=22544568&wm_longitude=113949059&openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490'
-resp = requests.post(url,headers=headers,data=payload)
-print(resp.text)
+# resp = requests.post(url,headers=headers,data=payload)
+# print(resp.text)
 
 
 # 详情页 商品 浏览器端 不过期
