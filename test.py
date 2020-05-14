@@ -1,4 +1,5 @@
 import base64
+import json
 import random
 import re
 import string
@@ -86,3 +87,20 @@ def encode_token():
 
 region = re.search(r'\w+市(\w+区)','广东省深圳市南山区大冲新城花园2栋2A座-212铺(靠近朗景园一侧1楼商铺)').group(1)
 print(region)
+
+category_dict = {}
+with open('Category.json', 'r', encoding='utf-8') as f:
+    data = f.read()
+json_data = json.loads(data)
+categories = json_data['data']['categories']
+for category in categories[1:-2]:
+    print(category)
+    first_categoryId = str(category['cateId'])
+    first_catename = category['name']
+    category_dict[first_categoryId] = first_catename
+    for subcate in category['subCate'][1:]:
+        second_categoryId = str(subcate['cateId'])
+        second_categoryname = subcate['name']
+        category_dict[second_categoryId] = second_categoryname
+        with open('cate_id.json', 'w', encoding='utf-8') as f:
+            f.write(str(category_dict))

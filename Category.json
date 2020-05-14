@@ -1,12 +1,14 @@
 {
 	"data": {
-		"categories": [{
+		"categories": [
+			{
 			"name": "全部品类",
 			"cateId": 0,
 			"count": 2486,
 			"all": true,
 			"priority": 0
-		}, {
+		},
+			{
 			"name": "美食",
 			"cateId": 910,
 			"count": 1453,
