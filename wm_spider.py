@@ -1,4 +1,6 @@
 import copy
+import re
+from pprint import pprint
 from time import time
 
 import requests
@@ -27,7 +29,7 @@ class WM_Spider:
         }
 
     # 'https://i.waimai.meituan.com/openh5/channel/kingkongshoplist?_=1589286163907'
-    def request_list_from_category(self,firstCategoryId,secondCategoryId,page='0',last_url='/channel/kingkongshoplist'):
+    def request_list_from_category(self,firstCategoryId,secondCategoryId,page='1',last_url='/channel/kingkongshoplist'):
         payload = 'startIndex={startIndex}&navigateType=910&firstCategoryId={firstCategoryId}&secondCategoryId={secondCategoryId}&geoType=2&platform=3&partner=4&originUrl=https://h5.waimai.meituan.com/waimai/mindex/kingkong?navigateType=910&firstCategoryId={firstCategoryId}&secondCategoryId={secondCategoryId}&title=%E7%BE%8E%E9%A3%9F&riskLevel=71&optimusCode=10&wm_actual_latitude={wm_actual_latitude}&wm_actual_longitude={wm_actual_longitude}&openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490'
         kwargs = {
             'startIndex': str(int(page) - 1),
@@ -47,12 +49,29 @@ class WM_Spider:
         payload = 'mtWmPoiId={mtWmPoiId}&openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490'.format(mtWmPoiId=poi_id)
         url = self.index_url + last_url + '?_=' + str(int(time() * 1000))
         response_json = self.post_request(url,self.headers,payload)
-
+        food_category_list = response_json['data']['categoryList']
+        hot_foods = []
+        for food_category in food_category_list:
+            if '热销' in food_category['categoryName']:
+                hot_foods.append(food_category)
+        return str(hot_foods)
     # 'https://i.waimai.meituan.com/openh5/poi/info?_=1589277696918'
     def request_detail_info(self,poi_id,last_url='/poi/info'):
         payload = 'mtWmPoiId={mtWmPoiId}&openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490'.format(mtWmPoiId=poi_id)
         url = self.index_url + last_url + '?_=' + str(int(time() * 1000))
         response_json = self.post_request(url,self.headers,payload)
+        kwargs = {}
+        # 商家服务
+        kwargs['mark'] = response_json['data']['brandMsg'] if 'brandMsg' in response_json['data'].keys() else ''
+        # 营业时间
+        kwargs['business_time'] = response_json['data']['serTime']
+        kwargs['address'] = response_json['data']['shopAddress']
+        #经纬度
+        kwargs['address_gps_long'] = response_json['data']['shopLng']
+        kwargs['address_gps_lat'] = response_json['data']['shopLat']
+        return kwargs
+
+
 
     # 'https://i.waimai.meituan.com/openh5/poi/comments?_=1589353892512'
     def request_detail_comments(self,poi_id,last_url='/poi/comments'):
@@ -69,4 +88,65 @@ class WM_Spider:
         response = requests.post(url=url,headers=headers,data=payload)
         return json.loads(response.content.decode())
 
-    def process_list_data(self,data):
+    def work(self):
+        data = self.request_list_from_category(firstCategoryId='910',secondCategoryId='100839')
+        # 是否有下一页
+        has_next_page = data['data']['poiHasNextPage']
+        # 店铺列表
+        for shop in data['data']['shopList']:
+            cur_kwargs = {}
+            cur_kwargs['source_data'] = '美团'
+            cur_kwargs['category_tags_l1_name'] = '910'
+            cur_kwargs['category_tags_l2_name'] = '910'
+            # 快餐便当
+            cur_kwargs['category_tags_l3_name'] = '100839'
+            shop_kwargs = self.process_shop_data(shop)
+            cur_kwargs.update(shop_kwargs)
+            # 获取商品信息 返回字符串 热销
+            hot_foods = self.request_detail_food(poi_id=cur_kwargs['shopid'])
+            cur_kwargs['popular_dishes'] = hot_foods
+            # # 获取商铺信息
+            info_kwargs = self.request_detail_info(poi_id=cur_kwargs['shopid'])
+            cur_kwargs.update(info_kwargs)
+            # # 获取商铺评论
+            # # self.request_detail_comments(poi_id=cur_kwargs['shopid'])
+            self.process_save_data(**cur_kwargs)
+            break
+
+    def process_shop_data(self,shop):
+        # 所需数据
+        kwargs = {}
+        kwargs['shopname'] = shop['shopName']
+        kwargs['shopid'] = shop['mtWmPoiId']
+        kwargs['cityname'] = '深圳'
+        # 起送价
+        kwargs['minimum_charge'] = shop['minPriceTip']
+        # 月售
+        kwargs['mon_sales'] = shop['monthSalesTip']  # 有疑虑
+        # 人均消费
+        kwargs['avg_speed'] = shop['averagePriceTip']
+        # 优惠活动
+        kwargs['special_offer'] = shop['discounts2']
+        return kwargs
+
+    def process_save_data(self,**kwargs):
+        # 区
+        kwargs['region'] = re.search(r'\w+市(\w+区)',kwargs['address']).group(1)
+        # 经纬度
+        kwargs['address_gps_lat'] = str(float('%.6f' % kwargs['address_gps_lat']) / 1000000)
+        kwargs['address_gps_long'] = str(float('%.6f' % kwargs['address_gps_long']) / 1000000)
+        # 人均
+        kwargs['avg_speed'] = float('%.2f' % int(kwargs['avg_speed'].replace('人均 ¥','')))
+        # 营业时间
+        kwargs['business_time'] = kwargs['business_time'][0]
+        # 起送
+        kwargs['minimum_charge'] = float('%.2f' % int(kwargs['minimum_charge'].replace('起送 ¥','')))
+        # 月售
+        kwargs['mon_sales'] = int(kwargs['mon_sales'].replace('月售','').replace('+',''))
+        pprint(kwargs)
+
+        
+
+if __name__ == '__main__':
+    mt_wm = WM_Spider(lat='22544568',lng='113949059')
+    mt_wm.work()

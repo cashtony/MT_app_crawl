@@ -1,5 +1,6 @@
 import base64
 import random
+import re
 import string
 import time
 import uuid
@@ -83,3 +84,5 @@ def encode_token():
 
 # TODO  "98390690" 看会不会变
 
+region = re.search(r'\w+市(\w+区)','广东省深圳市南山区大冲新城花园2栋2A座-212铺(靠近朗景园一侧1楼商铺)').group(1)
+print(region)
