@@ -19,7 +19,7 @@ class WM_Spider:
         self.city = city_id
         self.lat = lat
         self.lng = lng
-        self.proxy = taiyang_proxy()
+        self.proxy = None
         self.index_url = 'https://i.waimai.meituan.com/openh5'
         self.headers = {
             'Host': 'i.waimai.meituan.com',
@@ -72,17 +72,31 @@ class WM_Spider:
         url = self.index_url + last_url + '?_=' + str(int(time() * 1000))
         response_json = self.post_request(url,self.headers,payload)
         kwargs = {}
-        # 商家服务
-        kwargs['mark'] = response_json['data']['brandMsg'] if 'brandMsg' in response_json['data'].keys() else ''
-        # 营业时间
         try:
-            kwargs['business_time'] = response_json['data']['serTime']
+            # 商家服务
+            kwargs['mark'] = response_json['data']['brandMsg'] if 'brandMsg' in response_json['data'].keys() else ''
+            # 营业时间
+            try:
+                kwargs['business_time'] = response_json['data']['serTime']
+            except:
+                kwargs['business_time'] = ['']
+            kwargs['address'] = response_json['data']['shopAddress']
+            #经纬度
+            kwargs['address_gps_long'] = response_json['data']['shopLng']
+            kwargs['address_gps_lat'] = response_json['data']['shopLat']
         except:
-            kwargs['business_time'] = ['']
-        kwargs['address'] = response_json['data']['shopAddress']
-        #经纬度
-        kwargs['address_gps_long'] = response_json['data']['shopLng']
-        kwargs['address_gps_lat'] = response_json['data']['shopLat']
+            response_json = self.post_request(url, self.headers, payload)
+            # 商家服务
+            kwargs['mark'] = response_json['data']['brandMsg'] if 'brandMsg' in response_json['data'].keys() else ''
+            # 营业时间
+            try:
+                kwargs['business_time'] = response_json['data']['serTime']
+            except:
+                kwargs['business_time'] = ['']
+            kwargs['address'] = response_json['data']['shopAddress']
+            # 经纬度
+            kwargs['address_gps_long'] = response_json['data']['shopLng']
+            kwargs['address_gps_lat'] = response_json['data']['shopLat']
         return kwargs
 
 
@@ -165,14 +179,14 @@ class WM_Spider:
                 print('插入成功----:',shop['shopName'] + '$$$$'+ shop['mtWmPoiId'])
                 sleep(random.uniform(1,2))
             self.page += 1
-            sleep(random.uniform(5,6))
+            sleep(random.uniform(3,5))
         self.page = 1
 
 
     def process_shop_data(self,shop):
         # 所需数据
         kwargs = {}
-        kwargs['shopname'] = shop['shopName']
+        kwargs['shopname'] = shop['shopName'].replace("'","’")
         kwargs['shopid'] = shop['mtWmPoiId']
         kwargs['shop_score'] = shop['wmPoiScore']
         kwargs['cityname'] = '深圳'
@@ -193,7 +207,10 @@ class WM_Spider:
         # 行政区
 
         if '市' in kwargs['address'] and '区' in kwargs['address'] and '市场' not in kwargs['address'] and '城市' not in kwargs['address']:
-            kwargs['cityname'],kwargs['region'] = re.findall(r'(?!.*省)(\w+市)(\w+?区)',kwargs['address'])[0]
+            try:
+                kwargs['cityname'],kwargs['region'] = re.findall(r'(?!.*省)(\w+市)(\w+?区)',kwargs['address'])[0]
+            except:
+                kwargs['region'] = ''
         elif '区' in kwargs['address'] and '社区' not in kwargs['address']:
             kwargs['region'] = re.findall(r'(\w{2}区)',kwargs['address'])[0]
         else:
@@ -283,10 +300,20 @@ class WM_Spider:
 
 
 if __name__ == '__main__':
-    mt_wm = WM_Spider(lat='22544568',lng='113949059')
-    cateli = ['101789','100844','102145','102463','102464','910']
-    for cate in cateli:
-        mt_wm.work(secondCategoryId=cate)
+    mt_wm = WM_Spider(lat='22534662',lng='113972981')
+    cateli = ['100035','100040','100044','100038','100041','102479','100042','102481',
+              '101179','100209','100213','100856','100857','100953','100858','101110',
+              '100191','100849','100850','100904','100180','100238','100906','100369',
+              '100240','100244','100946','100905','100325','100966','100969','100967',
+              '100968','100321','102513','100852','100853','102515','102514','101792',
+              '100839','100840','101785','101786','100842','101615','101791','100841',
+              '101979','100944','103728','101790','101980','100843','101788','100845',
+              '101789','100844','102145','102463','102464']
+    # firstId 19
+    yinpin_cateli = ['100837','1044','1042','100000','100838']
+    for cate in cateli[12:40]:
+    # for cate in yinpin_cateli:
+        mt_wm.work(firstCategoryId='910',secondCategoryId=cate)
     # mt_wm.get_category('910','102011')
     # mt_wm.get_region('北京大学')
 
