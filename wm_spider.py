@@ -7,7 +7,7 @@ import psycopg2
 import requests
 import json
 from redis import Redis
-from proxy import abuyun
+from proxy import abuyun,taiyang_proxy
 
 redis_filter_name = 'filter_poi'
 class WM_Spider:
@@ -15,11 +15,11 @@ class WM_Spider:
         self.conn = psycopg2.connect(database="mt_wm_test", user="postgres", password="mc930816", host="127.0.0.1", port="5432")
         self.cur = self.conn.cursor()
         self.redis = Redis(decode_responses=True)
-        self.page = 2
+        self.page = 1
         self.city = city_id
         self.lat = lat
         self.lng = lng
-        self.proxy = None
+        self.proxy = taiyang_proxy()
         self.index_url = 'https://i.waimai.meituan.com/openh5'
         self.headers = {
             'Host': 'i.waimai.meituan.com',
@@ -29,7 +29,7 @@ class WM_Spider:
             'Referer': 'https://h5.waimai.meituan.com/waimai/mindex/menu?dpShopId=&mtShopId=1112840116809435&utm_source=wandoujia&channel=mtjj&source=shoplist&initialLat=22.544568&initialLng=113.949059&actualLat=22.544568&actualLng=113.949059',
             'Accept-Encoding': 'gzip, deflate',
             'Accept-Language': 'zh-CN,en-US;q=0.9',
-            'Cookie': 'cityid={city_id}; uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; utm_medium=android; utm_term=1000000202; utm_content=861735030994726; w_actual_lat={w_actual_lat}; w_actual_lng={w_actual_lng}'.format(city_id=city_id,w_actual_lat=self.lat,w_actual_lng=self.lng),
+            'Cookie' : 'cityid={city_id}; network=wifi; uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; utm_source=wandoujia; utm_medium=android; utm_term=1000000202; utm_content=861735030994726; wm_order_channel=mtjj; au_trace_key_net=default; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; terminal=i; w_utmz="utm_campaign=(direct)&utm_source=5000&utm_medium=(none)&utm_content=(none)&utm_term=(none)"; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; service-off=0; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024; channelType=%7b%22mtjj%22:%220%22%7d; w_actual_lat={lat}; w_actual_lng={lng}'.format(city_id=city_id,lat=lat,lng=lng),
             'X-Requested-With': 'com.sankuai.meituan',
             'Content-Type': 'application/x-www-form-urlencoded',
             'Connection': 'keep-alive',
@@ -64,6 +64,10 @@ class WM_Spider:
         return json.dumps(hot_foods)
     # 'https://i.waimai.meituan.com/openh5/poi/info?_=1589277696918'
     def request_detail_info(self,poi_id,last_url='/poi/info'):
+        headers = copy.deepcopy(self.headers)
+
+        headers['Cookie'] = 'cityid=30; network=wifi; uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; utm_source=wandoujia; utm_medium=android; utm_term=1000000202; utm_content=861735030994726; wm_order_channel=mtjj; au_trace_key_net=default; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; terminal=i; w_utmz="utm_campaign=(direct)&utm_source=5000&utm_medium=(none)&utm_content=(none)&utm_term=(none)"; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; service-off=0; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024; channelType={%22mtjj%22:%220%22}; w_actual_lat=22546510; w_actual_lng=113948770'
+
         payload = 'mtWmPoiId={mtWmPoiId}&openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490'.format(mtWmPoiId=poi_id)
         url = self.index_url + last_url + '?_=' + str(int(time() * 1000))
         response_json = self.post_request(url,self.headers,payload)
@@ -71,7 +75,10 @@ class WM_Spider:
         # 商家服务
         kwargs['mark'] = response_json['data']['brandMsg'] if 'brandMsg' in response_json['data'].keys() else ''
         # 营业时间
-        kwargs['business_time'] = response_json['data']['serTime']
+        try:
+            kwargs['business_time'] = response_json['data']['serTime']
+        except:
+            kwargs['business_time'] = ['']
         kwargs['address'] = response_json['data']['shopAddress']
         #经纬度
         kwargs['address_gps_long'] = response_json['data']['shopLng']
@@ -90,6 +97,20 @@ class WM_Spider:
 
         url = self.index_url + last_url + '?_=' + str(int(time() * 1000))
         response_json = self.post_request(url,headers=headers,payload=payload.format(mtWmPoiId=poi_id))
+        kwargs = {}
+        # 配送评分
+        kwargs['delivery_score'] = float('%.2f' % response_json['data']['deliveryScore'])
+        # 包装评分
+        # try:
+        kwargs['pack_score'] = float('%.2f' % response_json['data']['packScore'])
+        # except Exception as KeyError:
+        #     kwargs['pack_score'] = 0
+        # 口味评分
+        kwargs['taste_score'] = float('%.2f' % response_json['data']['qualityScore'])
+        # 评论
+        kwargs['comments'] = json.dumps(response_json['data']['list'])
+        return kwargs
+
 
     def post_request(self,url,headers,payload):
         headers['Cookie'] = 'cityid=30; network=wifi; uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; utm_source=wandoujia; utm_medium=android; utm_term=1000000202; utm_content=861735030994726; wm_order_channel=mtjj; au_trace_key_net=default; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; terminal=i; w_utmz="utm_campaign=(direct)&utm_source=5000&utm_medium=(none)&utm_content=(none)&utm_term=(none)"; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; service-off=0; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024; channelType={%22mtjj%22:%220%22}; w_actual_lat=22546510; w_actual_lng=113948770'
@@ -100,7 +121,8 @@ class WM_Spider:
         response = requests.post(url=url, headers=headers, data=payload)
         return json.loads(response.content.decode())
 
-    def work(self,firstCategoryId='910',secondCategoryId='100839'):
+    def work(self,firstCategoryId='910',secondCategoryId='101792'):
+        print('当前抓取第二分类：',secondCategoryId)
         has_next_page = True
         while has_next_page:
             print('当前页数------:',self.page)
@@ -110,7 +132,6 @@ class WM_Spider:
             has_next_page = data['data']['poiHasNextPage']
             # 店铺列表
             for shop in data['data']['shopList']:
-                self.proxy = abuyun()
                 # 去重过滤
                 if self.filter_poiId(shop['mtWmPoiId']):
                     print('这家店铺已存在-------：',shop['shopName'])
@@ -131,12 +152,13 @@ class WM_Spider:
                 info_kwargs = self.request_detail_info(poi_id=cur_kwargs['shopid'])
                 cur_kwargs.update(info_kwargs)
                 # # 获取商铺评论
-                # # self.request_detail_comments(poi_id=cur_kwargs['shopid'])
+                comment_kwargs = self.request_detail_comments(poi_id=cur_kwargs['shopid'])
+                cur_kwargs.update(comment_kwargs)
                 self.process_save_data(**cur_kwargs)
-                self.filter_add(shop['mtWmPoiId'])
                 print('插入成功----:',shop['shopName'] + '$$$$'+ shop['mtWmPoiId'])
                 sleep(random.uniform(1,2))
             self.page += 1
+            sleep(random.uniform(5,6))
 
 
     def process_shop_data(self,shop):
@@ -144,6 +166,7 @@ class WM_Spider:
         kwargs = {}
         kwargs['shopname'] = shop['shopName']
         kwargs['shopid'] = shop['mtWmPoiId']
+        kwargs['shop_score'] = shop['wmPoiScore']
         kwargs['cityname'] = '深圳'
         # 起送价
         kwargs['minimum_charge'] = shop['minPriceTip']
@@ -161,6 +184,8 @@ class WM_Spider:
             kwargs['region'] = '南山区'
         else:
             kwargs['region'] = self.get_region(kwargs['address'])
+        # 分数
+        kwargs['shop_score'] = float('%.2f' % (int(kwargs['shop_score']) / 10))
         # 经纬度
         kwargs['address_gps_lat'] = str(float('%.7f' % kwargs['address_gps_lat']) / 1000000)
         kwargs['address_gps_long'] = str(float('%.7f' % kwargs['address_gps_long']) / 1000000)
@@ -178,25 +203,29 @@ class WM_Spider:
         # 月售
         kwargs['mon_sales'] = int(kwargs['mon_sales'].replace('月售','').replace('+',''))
         kwargs['special_offer'] = json.dumps(kwargs['special_offer'])
-        print(kwargs)
+        # print(kwargs)
         # 插入数据
         self.insert_data(**kwargs)
 
 
     def insert_data(self,**kwargs):
         # self.conn.ping(reconnect=True)
-        sql = """insert into mt_wm (source_data,shopname,shopid,category_tags_l1_name,category_tags_l2_name,category_tags_l3_name,
-        cityname,region,address,address_gps_long,address_gps_lat,popular_dishes,minimum_charge,mon_sales,avg_speed,business_time,
-        special_offer,mark) values ('%(source_data)s','%(shopname)s','%(shopid)s','%(category_tags_l1_name)s','%(category_tags_l2_name)s',
-        '%(category_tags_l3_name)s','%(cityname)s','%(region)s','%(address)s','%(address_gps_long)s','%(address_gps_lat)s','%(popular_dishes)s',
-        '%(minimum_charge)f','%(mon_sales)d','%(avg_speed)f','%(business_time)s','%(special_offer)s','%(mark)s')""" %kwargs
 
-        try:
-            self.cur.execute(sql)
-        except Exception as e:
-            # print(e)
-            pass
+        sql = """
+        insert into mt_wm (source_data,shopname,shopid,category_tags_l1_name,category_tags_l2_name,category_tags_l3_name,
+        cityname,region,address,address_gps_long,address_gps_lat,shop_score,taste_score,pack_score,delivery_score,comments,popular_dishes,minimum_charge,mon_sales,avg_speed,business_time,
+        special_offer,mark) values ('%(source_data)s','%(shopname)s','%(shopid)s','%(category_tags_l1_name)s','%(category_tags_l2_name)s',
+        '%(category_tags_l3_name)s','%(cityname)s','%(region)s','%(address)s','%(address_gps_long)s','%(address_gps_lat)s','%(shop_score)f',
+        %(taste_score)f,%(pack_score)f,%(delivery_score)f,'%(comments)s','%(popular_dishes)s',
+        '%(minimum_charge)f','%(mon_sales)d','%(avg_speed)f','%(business_time)s','%(special_offer)s','%(mark)s')
+        ON CONFLICT (shopid)
+        DO UPDATE SET shop_score='%(shop_score)f',taste_score='%(taste_score)f',pack_score='%(pack_score)f',delivery_score='%(delivery_score)f',minimum_charge='%(minimum_charge)f',mon_sales='%(mon_sales)d',avg_speed='%(avg_speed)f',business_time='%(business_time)s',special_offer='%(special_offer)s',mark='%(mark)s';
+        """ % kwargs
+
+        self.cur.execute(sql)
         self.conn.commit()
+        self.filter_add(kwargs['shopid'])
+
 
 
     def get_category(self,firstcategoryId,secondcategoryId):
@@ -207,6 +236,8 @@ class WM_Spider:
         return firstcategoryname,secondcategoryname
 
     def get_region(self,address):
+        address = address.split('路')[0] + '路' if '路' in address else address.split('街道')[0] + '街道'
+        print(address)
         url = 'https://map.baidu.com/su?wd={}&cid=340&type=0&t=1589457215631'.format(address)
         headers = {
         'Accept': '*/*',
@@ -219,23 +250,25 @@ class WM_Spider:
         'Sec-Fetch-Site': 'same-origin',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36'
         }
-        resp = requests.get(url,headers).content.decode()
+
+        resp = requests.get(url,headers,proxies=self.proxy).content.decode()
+
         ret = json.loads(resp)
         region = ret['s'][0].split('$')[1]
         return region
 
     def filter_poiId(self,poiId):
-        pass
-        # return self.redis.sismember(redis_filter_name,poiId)
+        return self.redis.sismember(redis_filter_name,poiId)
 
     def filter_add(self,poiId):
-        pass
-        # self.redis.sadd(redis_filter_name,poiId)
+        self.redis.sadd(redis_filter_name,poiId)
 
 
 
 if __name__ == '__main__':
     mt_wm = WM_Spider(lat='22544568',lng='113949059')
-    mt_wm.work()
+    cateli = ['100842','101615','101791','100841','101979','100944','103728','101790']
+    for cate in cateli:
+        mt_wm.work(secondCategoryId=cate)
     # mt_wm.get_category('910','102011')
     # mt_wm.get_region('北京大学')
