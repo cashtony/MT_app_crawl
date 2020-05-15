@@ -108,7 +108,10 @@ class WM_Spider:
         # 口味评分
         kwargs['taste_score'] = float('%.2f' % response_json['data']['qualityScore'])
         # 评论
-        kwargs['comments'] = json.dumps(response_json['data']['list'])
+        try:
+            kwargs['comments'] = json.dumps(response_json['data']['list']).replace("'",'')
+        except Exception as KeyError:
+            kwargs['comments'] = ''
         return kwargs
 
 
@@ -129,7 +132,11 @@ class WM_Spider:
             data = self.request_list_from_category(page=self.page,firstCategoryId=firstCategoryId,secondCategoryId=secondCategoryId)
             category_tags_l2_name,category_tags_l3_name = self.get_category(firstCategoryId,secondCategoryId)
             # 是否有下一页
-            has_next_page = data['data']['poiHasNextPage']
+            try:
+                has_next_page = data['data']['poiHasNextPage']
+            except Exception as KeyError:
+                print('当前分类完成--------------：',secondCategoryId)
+                break
             # 店铺列表
             for shop in data['data']['shopList']:
                 # 去重过滤
@@ -159,6 +166,7 @@ class WM_Spider:
                 sleep(random.uniform(1,2))
             self.page += 1
             sleep(random.uniform(5,6))
+        self.page = 1
 
 
     def process_shop_data(self,shop):
@@ -175,15 +183,22 @@ class WM_Spider:
         # 人均消费
         kwargs['avg_speed'] = shop['averagePriceTip']
         # 优惠活动
-        kwargs['special_offer'] = shop['discounts2']
+        try:
+            kwargs['special_offer'] = shop['discounts2']
+        except Exception as KeyError:
+            kwargs['special_offer'] = ''
         return kwargs
 
     def process_save_data(self,**kwargs):
         # 行政区
-        if '南山区' in kwargs['address']:
-            kwargs['region'] = '南山区'
+
+        if '市' in kwargs['address'] and '区' in kwargs['address'] and '市场' not in kwargs['address'] and '城市' not in kwargs['address']:
+            kwargs['cityname'],kwargs['region'] = re.findall(r'(?!.*省)(\w+市)(\w+?区)',kwargs['address'])[0]
+        elif '区' in kwargs['address'] and '社区' not in kwargs['address']:
+            kwargs['region'] = re.findall(r'(\w{2}区)',kwargs['address'])[0]
         else:
-            kwargs['region'] = self.get_region(kwargs['address'])
+            kwargs['region'] = ''
+        kwargs['cityname'] = kwargs['cityname'].replace('市','')
         # 分数
         kwargs['shop_score'] = float('%.2f' % (int(kwargs['shop_score']) / 10))
         # 经纬度
@@ -192,14 +207,13 @@ class WM_Spider:
 
         # 人均
         try:
-            kwargs['avg_speed'] = float('%.2f' % int(kwargs['avg_speed'].replace('人均 ¥','')))
+            kwargs['avg_speed'] = float('%.2f' % float(kwargs['avg_speed'].replace('人均 ¥','')))
         except:
             kwargs['avg_speed'] = 0
         # 营业时间
         kwargs['business_time'] = kwargs['business_time'][0]
         # 起送
-        print(kwargs['minimum_charge'])
-        kwargs['minimum_charge'] = float('%.2f' % int(kwargs['minimum_charge'].replace('起送 ¥','')))
+        kwargs['minimum_charge'] = float('%.2f' % float(kwargs['minimum_charge'].replace('起送 ¥','')))
         # 月售
         kwargs['mon_sales'] = int(kwargs['mon_sales'].replace('月售','').replace('+',''))
         kwargs['special_offer'] = json.dumps(kwargs['special_offer'])
@@ -219,7 +233,7 @@ class WM_Spider:
         %(taste_score)f,%(pack_score)f,%(delivery_score)f,'%(comments)s','%(popular_dishes)s',
         '%(minimum_charge)f','%(mon_sales)d','%(avg_speed)f','%(business_time)s','%(special_offer)s','%(mark)s')
         ON CONFLICT (shopid)
-        DO UPDATE SET shop_score='%(shop_score)f',taste_score='%(taste_score)f',pack_score='%(pack_score)f',delivery_score='%(delivery_score)f',minimum_charge='%(minimum_charge)f',mon_sales='%(mon_sales)d',avg_speed='%(avg_speed)f',business_time='%(business_time)s',special_offer='%(special_offer)s',mark='%(mark)s';
+        DO UPDATE SET cityname='%(cityname)s',region='%(region)s',shop_score='%(shop_score)f',taste_score='%(taste_score)f',pack_score='%(pack_score)f',delivery_score='%(delivery_score)f',minimum_charge='%(minimum_charge)f',mon_sales='%(mon_sales)d',avg_speed='%(avg_speed)f',business_time='%(business_time)s',special_offer='%(special_offer)s',mark='%(mark)s';
         """ % kwargs
 
         self.cur.execute(sql)
@@ -236,7 +250,7 @@ class WM_Spider:
         return firstcategoryname,secondcategoryname
 
     def get_region(self,address):
-        address = address.split('路')[0] + '路' if '路' in address else address.split('街道')[0] + '街道'
+        address = address.split('路')[0] + '路' if '路' in address else address.split('街')[0] + '街'
         print(address)
         url = 'https://map.baidu.com/su?wd={}&cid=340&type=0&t=1589457215631'.format(address)
         headers = {
@@ -250,12 +264,15 @@ class WM_Spider:
         'Sec-Fetch-Site': 'same-origin',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36'
         }
-
-        resp = requests.get(url,headers,proxies=self.proxy).content.decode()
-
+        try:
+            resp = requests.get(url,headers,proxies=self.proxy).content.decode()
+        except:
+            self.proxy = taiyang_proxy()
+            resp = requests.get(url,headers,proxies=self.proxy).content.decode()
         ret = json.loads(resp)
         region = ret['s'][0].split('$')[1]
-        return region
+        city = ret['s'][0].split('$')[0]
+        return city,region
 
     def filter_poiId(self,poiId):
         return self.redis.sismember(redis_filter_name,poiId)
@@ -267,8 +284,12 @@ class WM_Spider:
 
 if __name__ == '__main__':
     mt_wm = WM_Spider(lat='22544568',lng='113949059')
-    cateli = ['100842','101615','101791','100841','101979','100944','103728','101790']
+    cateli = ['101789','100844','102145','102463','102464','910']
     for cate in cateli:
         mt_wm.work(secondCategoryId=cate)
     # mt_wm.get_category('910','102011')
     # mt_wm.get_region('北京大学')
+
+
+    # 23186026
+    # 协和深圳医院物联网医院
