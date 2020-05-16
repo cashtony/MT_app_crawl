@@ -9,6 +9,7 @@ import zlib
 from datetime import datetime
 from pprint import pprint
 
+import psycopg2
 import requests
 from sign import rest_sign
 
@@ -128,3 +129,10 @@ print(s)
 # DO UPDATE SET shop_score='%(shop_score)f',taste_score='%(taste_score)f',pack_score='%(pack_score)f',delivery_score='%(delivery_score)f',minimum_charge='%(minimum_charge)f',mon_sales='%(mon_sales)d',avg_speed='%(avg_speed)f',business_time='%(business_time)s',special_offer='%(special_offer)s',mark='%(mark)s' where shopid='%(shopid)s';
 # """
 
+conn = psycopg2.connect(database="mt_wm_test", user="postgres", password="mc930816", host="127.0.0.1", port="5432")
+cur = conn.cursor()
+
+sql = """select comments from mt_wm where shopid='856847181222725'"""
+cur.execute(sql)
+ret = cur.fetchone()[0]
+print(json.loads(ret))

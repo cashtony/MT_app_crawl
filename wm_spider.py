@@ -228,7 +228,7 @@ class WM_Spider:
         except:
             kwargs['avg_speed'] = 0
         # 营业时间
-        kwargs['business_time'] = kwargs['business_time'][0]
+        kwargs['business_time'] = json.dumps(kwargs['business_time'])
         # 起送
         kwargs['minimum_charge'] = float('%.2f' % float(kwargs['minimum_charge'].replace('起送 ¥','')))
         # 月售
@@ -299,6 +299,8 @@ class WM_Spider:
 
 
 
+
+
 if __name__ == '__main__':
     mt_wm = WM_Spider(lat='22534662',lng='113972981')
     cateli = ['100035','100040','100044','100038','100041','102479','100042','102481',
@@ -318,5 +320,3 @@ if __name__ == '__main__':
     # mt_wm.get_region('北京大学')
 
 
-    # 23186026
-    # 协和深圳医院物联网医院
