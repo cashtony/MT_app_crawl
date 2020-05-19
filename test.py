@@ -10,6 +10,7 @@ from datetime import datetime
 from pprint import pprint
 
 import psycopg2
+import redis
 import requests
 from sign import rest_sign
 
@@ -128,14 +129,43 @@ print(s)
 # ON CONFLICT (shopid)
 # DO UPDATE SET shop_score='%(shop_score)f',taste_score='%(taste_score)f',pack_score='%(pack_score)f',delivery_score='%(delivery_score)f',minimum_charge='%(minimum_charge)f',mon_sales='%(mon_sales)d',avg_speed='%(avg_speed)f',business_time='%(business_time)s',special_offer='%(special_offer)s',mark='%(mark)s' where shopid='%(shopid)s';
 # """
+#
+# conn = psycopg2.connect(database="mt_wm_test", user="postgres", password="mc930816", host="127.0.0.1", port="5432")
+# cur = conn.cursor()
 
-conn = psycopg2.connect(database="mt_wm_test", user="postgres", password="mc930816", host="127.0.0.1", port="5432")
-cur = conn.cursor()
-
-sql = """select comments from mt_wm where shopid='856847181222725'"""
-cur.execute(sql)
-ret = cur.fetchone()[0]
-print(json.loads(ret))
+# sql = """select comments from mt_wm where shopid='856847181222725'"""
+# cur.execute(sql)
+# ret = cur.fetchone()[0]
+# print(json.loads(ret))
 
 
 print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+
+
+latlng_list = [('22515737','114069273'),('22595087','114513254'),('22629908','114425497'),('22564938','114050546'),('22695350','114216918'),('22555461','114151070'),('22539352','114494500'),('22490830','114580954'),('22689812','114348183'),('22681653','113939385'),('22771264','113844243'),('22563406','114111295'),('22567280','114130052'),('22557001','114236739'),('22544675','114570276')]
+for lat,lng in latlng_list:
+    print(lat)
+    print(lng)
+
+
+
+# beijing_latlng_list = [
+#     "117073221,40493866","116322056,39894910","116435806,39908501","116195142,40224933","116557351,39912182",
+#     "116429172,39510561","116277505,39910506","116458855,39909863","116542574,40073242","116657851,39907872",
+#     "116382590,39942143","116670334,40354822","116494776,39867730","116328344,40078096","116454982,39878934",
+#     "116381729,39968002","116843177,40376834","117119254,40147761","116398353,39900558","116455294,39937492",
+#     "116280902,40168114","116306750,40041730","116603039,40080525","116738741,40142258","116412557,39912742",
+#     "116466485,39995197","116375121,39908342","116353714,39939588","116408027,39991761","115981383,40464504",
+#     "116488382,39878439","116481835,39800184","116404000,39873135","116319802,39982940","116277687,39866858"
+# ]
+#
+# redis_cli = redis.Redis(decode_responses=True)
+# for i in beijing_latlng_list:
+#     str1 = "1" + ',' + i
+#     print(str1)
+#     redis_cli.sadd('wm_site',str1)
+
+xian_latlng_list = [
+    "108.947517,34.294762","109.075219,34.317932","108.993285,34.253687","108.874577,34.274005","108.839179,34.226926",
+    "108.961961,34.276905","108.907985,34.246358","108.964176,34.218229","108.927638,34.213369",""
+]

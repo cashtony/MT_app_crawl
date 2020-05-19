@@ -1,6 +1,7 @@
 #coding:utf-8
 import copy
 import hashlib
+from multiprocessing import Process
 import random
 import re
 from datetime import datetime
@@ -12,12 +13,13 @@ import json
 from redis import Redis
 from proxy import abuyun,taiyang_proxy
 
+redis_name = 'wm_site'
 redis_filter_name = 'filter_poi'
+conn = psycopg2.connect(database="mt_wm_test", user="postgres", password="postgres", host="127.0.0.1", port="5432")
+cur = conn.cursor()
+redis = Redis(decode_responses=True)
 class WM_Spider:
     def __init__(self,lat,lng,city_id='30'):
-        self.conn = psycopg2.connect(database="mt_wm_test", user="postgres", password="postgres", host="127.0.0.1", port="5432")
-        self.cur = self.conn.cursor()
-        self.redis = Redis(decode_responses=True)
         self.page = 1
         self.city = city_id
         self.lat = lat
@@ -63,7 +65,11 @@ class WM_Spider:
             food_category_list = response_json['data']['categoryList']
         except:
             response_json = self.post_request(url, self.headers, payload)
-            food_category_list = response_json['data']['categoryList']
+            try:
+                food_category_list = response_json['data']['categoryList']
+            except Exception as TypeError:
+                return ''
+
         hot_foods = []
         for food_category in food_category_list:
             if '热销' in food_category['categoryName']:
@@ -73,7 +79,7 @@ class WM_Spider:
     def request_detail_info(self,poi_id,last_url='/poi/info'):
         headers = copy.deepcopy(self.headers)
 
-        headers['Cookie'] = 'cityid=30; network=wifi; uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; utm_source=wandoujia; utm_medium=android; utm_term=1000000202; utm_content=861735030994726; wm_order_channel=mtjj; au_trace_key_net=default; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; terminal=i; w_utmz="utm_campaign=(direct)&utm_source=5000&utm_medium=(none)&utm_content=(none)&utm_term=(none)"; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; service-off=0; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024; channelType={%22mtjj%22:%220%22}; w_actual_lat=22546510; w_actual_lng=113948770'
+        headers['Cookie'] = 'cityid={cityid}; network=wifi; uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; utm_source=wandoujia; utm_medium=android; utm_term=1000000202; utm_content=861735030994726; wm_order_channel=mtjj; au_trace_key_net=default; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; terminal=i; w_utmz="utm_campaign=(direct)&utm_source=5000&utm_medium=(none)&utm_content=(none)&utm_term=(none)"; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; service-off=0; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024; '.format(cityid=self.city)+'channelType={%22mtjj%22:%220%22}; '+'w_actual_lat={lat}; w_actual_lng={lng}'.format(lat=self.lat,lng=self.lng)
 
         payload = 'mtWmPoiId={mtWmPoiId}&openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490'.format(mtWmPoiId=poi_id)
         url = self.index_url + last_url + '?_=' + str(int(time() * 1000))
@@ -130,7 +136,10 @@ class WM_Spider:
         except Exception as KeyError:
             kwargs['pack_score'] = 0
         # 口味评分
-        kwargs['taste_score'] = float('%.2f' % response_json['data']['qualityScore'])
+        try:
+            kwargs['taste_score'] = float('%.2f' % response_json['data']['qualityScore'])
+        except:
+            kwargs['taste_score'] = 0
         # 评论
         try:
             kwargs['comments'] = json.dumps(response_json['data']['list']).replace("'",'')
@@ -140,15 +149,20 @@ class WM_Spider:
 
 
     def post_request(self,url,headers,payload):
-        headers['Cookie'] = 'cityid=30; network=wifi; uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; utm_source=wandoujia; utm_medium=android; utm_term=1000000202; utm_content=861735030994726; wm_order_channel=mtjj; au_trace_key_net=default; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; terminal=i; w_utmz="utm_campaign=(direct)&utm_source=5000&utm_medium=(none)&utm_content=(none)&utm_term=(none)"; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; service-off=0; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024; channelType={%22mtjj%22:%220%22}; w_actual_lat=22546510; w_actual_lng=113948770'
+        headers['Cookie'] = 'cityid={}; network=wifi; uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; utm_source=wandoujia; utm_medium=android; utm_term=1000000202; utm_content=861735030994726; wm_order_channel=mtjj; au_trace_key_net=default; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; terminal=i; w_utmz="utm_campaign=(direct)&utm_source=5000&utm_medium=(none)&utm_content=(none)&utm_term=(none)"; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; service-off=0; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024;'.format(self.city)+' channelType={%22mtjj%22:%220%22}; '+'w_actual_lat={lat}; w_actual_lng={lng}'.format(lat=self.lat,lng=self.lng)
         # if self.proxy == None:
         #     response = requests.post(url=url,headers=headers,data=payload)
         # else:
         #     response = requests.post(url=url, headers=headers, data=payload, proxies=self.proxy)
         response = requests.post(url=url, headers=headers, data=payload)
-        return json.loads(response.content.decode())
+        try:
+            json_response = json.loads(response.content.decode())
+        except:
+            return {}
+        return json_response
 
     def work(self,firstCategoryId='910',secondCategoryId='101792'):
+        print('当前抓取经纬度-----------:',self.city + '&'+self.lat + '&' + self.lng)
         print('当前抓取第二分类：',secondCategoryId)
         has_next_page = True
         while has_next_page:
@@ -187,9 +201,9 @@ class WM_Spider:
                 cur_kwargs.update(comment_kwargs)
                 self.process_save_data(**cur_kwargs)
                 print('插入成功----:',shop['shopName'] + '$$$$'+ shop['mtWmPoiId'])
-                sleep(random.uniform(0.2,0.5))
+                sleep(random.uniform(0.2,0.6))
             self.page += 1
-            sleep(random.uniform(1,3))
+            sleep(random.uniform(1,1.5))
         self.page = 1
 
 
@@ -199,7 +213,9 @@ class WM_Spider:
         kwargs['shopname'] = shop['shopName'].replace("'","’")
         kwargs['shopid'] = shop['mtWmPoiId']
         kwargs['shop_score'] = shop['wmPoiScore']
-        kwargs['cityname'] = '深圳'
+        # 构造商铺url
+        kwargs['url'] = 'https://i.waimai.meituan.com/external/poi/{}?utm_source=5913&amp;wmi_from=cpoiinfo&amp;user_id=0'.format(kwargs['shopid'])
+        kwargs['cityname'] = self.get_cityname()
         # 起送价
         kwargs['minimum_charge'] = shop['minPriceTip']
         # 月售
@@ -255,8 +271,8 @@ class WM_Spider:
         #添加时间
         kwargs['update_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         # 插入数据
-
-        self.insert_data(**kwargs)
+        if kwargs['shopname'] and kwargs['address'] and kwargs['address_gps_long'] and kwargs['address_gps_lat']:
+            self.insert_data(**kwargs)
 
 
     def insert_data(self,**kwargs):
@@ -265,16 +281,16 @@ class WM_Spider:
         sql = """
         insert into mt_wm (source_data,shopname,shopid,category_tags_l1_name,category_tags_l2_name,category_tags_l3_name,
         cityname,region,address,address_gps_long,address_gps_lat,shop_score,taste_score,pack_score,delivery_score,comments,popular_dishes,minimum_charge,mon_sales,avg_speed,business_time,
-        special_offer,mark,id,update_time) values ('%(source_data)s','%(shopname)s','%(shopid)s','%(category_tags_l1_name)s','%(category_tags_l2_name)s',
+        special_offer,mark,id,update_time,url) values ('%(source_data)s','%(shopname)s','%(shopid)s','%(category_tags_l1_name)s','%(category_tags_l2_name)s',
         '%(category_tags_l3_name)s','%(cityname)s','%(region)s','%(address)s','%(address_gps_long)s','%(address_gps_lat)s','%(shop_score)f',
         %(taste_score)f,%(pack_score)f,%(delivery_score)f,'%(comments)s','%(popular_dishes)s',
-        '%(minimum_charge)f','%(mon_sales)d','%(avg_speed)f','%(business_time)s','%(special_offer)s','%(mark)s','%(id)s','%(update_time)s')
+        '%(minimum_charge)f','%(mon_sales)d','%(avg_speed)f','%(business_time)s','%(special_offer)s','%(mark)s','%(id)s','%(update_time)s','%(url)s')
         ON CONFLICT (id)
-        DO UPDATE SET cityname='%(cityname)s',region='%(region)s',shop_score='%(shop_score)f',taste_score='%(taste_score)f',pack_score='%(pack_score)f',delivery_score='%(delivery_score)f',minimum_charge='%(minimum_charge)f',mon_sales='%(mon_sales)d',avg_speed='%(avg_speed)f',business_time='%(business_time)s',special_offer='%(special_offer)s',mark='%(mark)s',update_time='%(update_time)s';
+        DO UPDATE SET cityname='%(cityname)s',region='%(region)s',shop_score='%(shop_score)f',taste_score='%(taste_score)f',pack_score='%(pack_score)f',delivery_score='%(delivery_score)f',minimum_charge='%(minimum_charge)f',mon_sales='%(mon_sales)d',avg_speed='%(avg_speed)f',business_time='%(business_time)s',special_offer='%(special_offer)s',mark='%(mark)s',update_time='%(update_time)s',url='%(url)s';
         """ % kwargs
 
-        self.cur.execute(sql)
-        self.conn.commit()
+        cur.execute(sql)
+        conn.commit()
         self.filter_add(kwargs['shopid'])
 
 
@@ -312,34 +328,77 @@ class WM_Spider:
         return city,region
 
     def filter_poiId(self,poiId):
-        return self.redis.sismember(redis_filter_name,poiId)
+        return redis.sismember(redis_filter_name,poiId)
 
     def filter_add(self,poiId):
-        self.redis.sadd(redis_filter_name,poiId)
+        redis.sadd(redis_filter_name,poiId)
 
     def get_unique_id(self,**kwargs):
         hash_str = kwargs['source_data'] + '$' + kwargs['shopname'] + '$' + kwargs['address'] + '$' + str(kwargs['address_gps_long']) + '$' + str(kwargs['address_gps_lat'])
 
         return hashlib.md5(hash_str.encode('utf-8')).hexdigest()
 
+    def get_cityname(self):
+        with open('city_id.json','r',encoding='utf-8') as f:
+            data = json.loads(f.read())
+        return data[self.city]
 
+def run():
+    while True:
+        wm_args = redis.spop(redis_name)
+        city_id = wm_args.split(',')[0]
+        lat = wm_args.split(',')[2]
+        lng = wm_args.split(',')[1]
+        mt_wm = WM_Spider(lat=lat, lng=lng,city_id=city_id)
+        cateli = ['101792', '100839', '100840', '101785', '101786',
+                  '100842', '101615', '101791', '100841', '101979',
+                  '100944', '103728', '101790', '101980', '100843',
+                  '101788', '100845', '101789', '100844', '102145',
+                  '102463', '102464']
+        for cate in cateli:
+            mt_wm.work(firstCategoryId='910', secondCategoryId=cate)
+        yinpin_cateli = ['100837', '1044', '1042', '100000', '100838']
+        for cate in yinpin_cateli:
+            mt_wm.work(firstCategoryId='19', secondCategoryId=cate)
 
 if __name__ == '__main__':
-    mt_wm = WM_Spider(lat='22777549',lng='113895342')
-    cateli = ['100035','100040','100044','100038','100041','102479','100042','102481',
-              '101179','100209','100213','100856','100857','100953','100858','101110',
-              '100191','100849','100850','100904','100180','100238','100906','100369',
-              '100240','100244','100946','100905','100325','100966','100969','100967',
-              '100968','100321','102513','100852','100853','102515','102514','101792',
-              '100839','100840','101785','101786','100842','101615','101791','100841',
-              '101979','100944','103728','101790','101980','100843','101788','100845',
-              '101789','100844','102145','102463','102464']
-    # firstId 19
-    # yinpin_cateli = ['100837','1044','1042','100000','100838']
-    for cate in cateli[45:]:
-    # for cate in yinpin_cateli:
-        mt_wm.work(firstCategoryId='910',secondCategoryId=cate)
-    # mt_wm.get_category('910','102011')
-    # mt_wm.get_region('北京大学')
+    for i in range(3):
+        p = Process(target=run)
+        p.start()
+    # latlng_list = [('22515737','114069273'),('22595087','114513254'),('22629908','114425497'),('22564938','114050546'),('22695350','114216918'),('22555461','114151070'),('22539352','114494500'),('22490830','114580954'),('22689812','114348183'),('22681653','113939385'),('22771264','113844243'),('22563406','114111295'),('22567280','114130052'),('22557001','114236739'),('22544675','114570276')]
+    # for lat,lng in latlng_list:
+    #     mt_wm = WM_Spider(lat=lat,lng=lng)
+    #     cateli = ['100035','100040','100044','100038','100041','102479','100042','102481',
+    #               '101179','100209','100213','100856','100857','100953','100858','101110',
+    #               '100191','100849','100850','100904','100180','100238','100906','100369',
+    #               '100240','100244','100946','100905','100325','100966','100969','100967',
+    #               '100968','100321','102513','100852','100853','102515','102514','101792',
+    #               '100839','100840','101785','101786','100842','101615','101791','100841',
+    #               '101979','100944','103728','101790','101980','100843','101788','100845',
+    #               '101789','100844','102145','102463','102464']
+    #     cateli = ['101792', '100839', '100840', '101785', '101786',
+    #               '100842', '101615', '101791', '100841', '101979',
+    #               '100944', '103728', '101790', '101980', '100843',
+    #               '101788', '100845', '101789', '100844', '102145',
+    #               '102463', '102464']
+    #     for cate in cateli[8:]:
+    #         mt_wm.work(firstCategoryId='910',secondCategoryId=cate)
+    #     yinpin_cateli = ['100837','1044','1042','100000','100838']
+    #     for cate in yinpin_cateli:
+    #         mt_wm.work(firstCategoryId='19',secondCategoryId=cate)
+
+
+
+
+
+# beijing_latlng_list = [
+#     "117073221,40493866","116322056,39894910","116435806,39908501","116195142,40224933","116557351,39912182",
+#     "116429172,39510561","116277505,39910506","116458855,39909863","116542574,40073242","116657851,39907872",
+#     "116382590,39942143","116670334,40354822","116494776,39867730","116328344,40078096","116454982,39878934",
+#     "116381729,39968002","116843177,40376834","117119254,40147761","116398353,39900558","116455294,39937492",
+#     "116280902,40168114","116306750,40041730","116603039,40080525","116738741,40142258","116412557,39912742",
+#     "116466485,39995197","116375121,39908342","116353714,39939588","116408027,39991761","115981383,40464504",
+#     "116488382,39878439","116481835,39800184","116404000,39873135","116319802,39982940","116277687,39866858"
+# ]
 
 
