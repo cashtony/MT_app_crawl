@@ -1,6 +1,8 @@
 import copy
+import hashlib
 import random
 import re
+from datetime import datetime
 from pprint import pprint
 from time import time, sleep
 import psycopg2
@@ -12,7 +14,7 @@ from proxy import abuyun,taiyang_proxy
 redis_filter_name = 'filter_poi'
 class WM_Spider:
     def __init__(self,lat,lng,city_id='30'):
-        self.conn = psycopg2.connect(database="mt_wm_test", user="postgres", password="mc930816", host="127.0.0.1", port="5432")
+        self.conn = psycopg2.connect(database="mt_wm_test", user="postgres", password="postgres", host="127.0.0.1", port="5432")
         self.cur = self.conn.cursor()
         self.redis = Redis(decode_responses=True)
         self.page = 1
@@ -56,12 +58,16 @@ class WM_Spider:
         payload = 'mtWmPoiId={mtWmPoiId}&openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490'.format(mtWmPoiId=poi_id)
         url = self.index_url + last_url + '?_=' + str(int(time() * 1000))
         response_json = self.post_request(url,self.headers,payload)
-        food_category_list = response_json['data']['categoryList']
+        try:
+            food_category_list = response_json['data']['categoryList']
+        except:
+            response_json = self.post_request(url, self.headers, payload)
+            food_category_list = response_json['data']['categoryList']
         hot_foods = []
         for food_category in food_category_list:
             if '热销' in food_category['categoryName']:
                 hot_foods.append(food_category)
-        return json.dumps(hot_foods)
+        return json.dumps(hot_foods).replace("'",'')
     # 'https://i.waimai.meituan.com/openh5/poi/info?_=1589277696918'
     def request_detail_info(self,poi_id,last_url='/poi/info'):
         headers = copy.deepcopy(self.headers)
@@ -113,12 +119,15 @@ class WM_Spider:
         response_json = self.post_request(url,headers=headers,payload=payload.format(mtWmPoiId=poi_id))
         kwargs = {}
         # 配送评分
-        kwargs['delivery_score'] = float('%.2f' % response_json['data']['deliveryScore'])
+        try:
+            kwargs['delivery_score'] = float('%.2f' % response_json['data']['deliveryScore'])
+        except Exception as KeyError:
+            kwargs['delivery_score'] = 0
         # 包装评分
-        # try:
-        kwargs['pack_score'] = float('%.2f' % response_json['data']['packScore'])
-        # except Exception as KeyError:
-        #     kwargs['pack_score'] = 0
+        try:
+            kwargs['pack_score'] = float('%.2f' % response_json['data']['packScore'])
+        except Exception as KeyError:
+            kwargs['pack_score'] = 0
         # 口味评分
         kwargs['taste_score'] = float('%.2f' % response_json['data']['qualityScore'])
         # 评论
@@ -160,7 +169,7 @@ class WM_Spider:
                 print('抓取店铺--------:',shop['shopName'],'$$$$',shop['mtWmPoiId'])
                 cur_kwargs = {}
                 cur_kwargs['source_data'] = '美团'
-                cur_kwargs['category_tags_l1_name'] = '外卖'
+                cur_kwargs['category_tags_l1_name'] = '美食'
                 cur_kwargs['category_tags_l2_name'] = category_tags_l2_name
                 # 快餐便当
                 cur_kwargs['category_tags_l3_name'] = category_tags_l3_name
@@ -177,9 +186,9 @@ class WM_Spider:
                 cur_kwargs.update(comment_kwargs)
                 self.process_save_data(**cur_kwargs)
                 print('插入成功----:',shop['shopName'] + '$$$$'+ shop['mtWmPoiId'])
-                sleep(random.uniform(1,2))
+                sleep(random.uniform(0.2,0.5))
             self.page += 1
-            sleep(random.uniform(3,5))
+            sleep(random.uniform(1,3))
         self.page = 1
 
 
@@ -198,7 +207,9 @@ class WM_Spider:
         kwargs['avg_speed'] = shop['averagePriceTip']
         # 优惠活动
         try:
-            kwargs['special_offer'] = shop['discounts2']
+            kwargs['special_offer'] = []
+            for special_offer in shop['discounts2']:
+                kwargs['special_offer'].append(special_offer['info'])
         except Exception as KeyError:
             kwargs['special_offer'] = ''
         return kwargs
@@ -212,10 +223,13 @@ class WM_Spider:
             except:
                 kwargs['region'] = ''
         elif '区' in kwargs['address'] and '社区' not in kwargs['address']:
-            kwargs['region'] = re.findall(r'(\w{2}区)',kwargs['address'])[0]
+            try:
+                kwargs['region'] = re.findall(r'(\w{2}区)',kwargs['address'])[0]
+            except:
+                kwargs['region'] = ''
         else:
             kwargs['region'] = ''
-        kwargs['cityname'] = kwargs['cityname'].replace('市','')
+        kwargs['cityname'] = kwargs['cityname'] if '市' in kwargs['cityname'] else kwargs['cityname'] + '市'
         # 分数
         kwargs['shop_score'] = float('%.2f' % (int(kwargs['shop_score']) / 10))
         # 经纬度
@@ -233,9 +247,14 @@ class WM_Spider:
         kwargs['minimum_charge'] = float('%.2f' % float(kwargs['minimum_charge'].replace('起送 ¥','')))
         # 月售
         kwargs['mon_sales'] = int(kwargs['mon_sales'].replace('月售','').replace('+',''))
-        kwargs['special_offer'] = json.dumps(kwargs['special_offer'])
+        kwargs['special_offer'] = json.dumps(kwargs['special_offer']).replace("'",'')
         # print(kwargs)
+        # 构造id
+        kwargs['id'] = self.get_unique_id(**kwargs)
+        #添加时间
+        kwargs['update_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         # 插入数据
+
         self.insert_data(**kwargs)
 
 
@@ -245,12 +264,12 @@ class WM_Spider:
         sql = """
         insert into mt_wm (source_data,shopname,shopid,category_tags_l1_name,category_tags_l2_name,category_tags_l3_name,
         cityname,region,address,address_gps_long,address_gps_lat,shop_score,taste_score,pack_score,delivery_score,comments,popular_dishes,minimum_charge,mon_sales,avg_speed,business_time,
-        special_offer,mark) values ('%(source_data)s','%(shopname)s','%(shopid)s','%(category_tags_l1_name)s','%(category_tags_l2_name)s',
+        special_offer,mark,id,update_time) values ('%(source_data)s','%(shopname)s','%(shopid)s','%(category_tags_l1_name)s','%(category_tags_l2_name)s',
         '%(category_tags_l3_name)s','%(cityname)s','%(region)s','%(address)s','%(address_gps_long)s','%(address_gps_lat)s','%(shop_score)f',
         %(taste_score)f,%(pack_score)f,%(delivery_score)f,'%(comments)s','%(popular_dishes)s',
-        '%(minimum_charge)f','%(mon_sales)d','%(avg_speed)f','%(business_time)s','%(special_offer)s','%(mark)s')
-        ON CONFLICT (shopid)
-        DO UPDATE SET cityname='%(cityname)s',region='%(region)s',shop_score='%(shop_score)f',taste_score='%(taste_score)f',pack_score='%(pack_score)f',delivery_score='%(delivery_score)f',minimum_charge='%(minimum_charge)f',mon_sales='%(mon_sales)d',avg_speed='%(avg_speed)f',business_time='%(business_time)s',special_offer='%(special_offer)s',mark='%(mark)s';
+        '%(minimum_charge)f','%(mon_sales)d','%(avg_speed)f','%(business_time)s','%(special_offer)s','%(mark)s','%(id)s','%(update_time)s')
+        ON CONFLICT (id)
+        DO UPDATE SET cityname='%(cityname)s',region='%(region)s',shop_score='%(shop_score)f',taste_score='%(taste_score)f',pack_score='%(pack_score)f',delivery_score='%(delivery_score)f',minimum_charge='%(minimum_charge)f',mon_sales='%(mon_sales)d',avg_speed='%(avg_speed)f',business_time='%(business_time)s',special_offer='%(special_offer)s',mark='%(mark)s',update_time='%(update_time)s';
         """ % kwargs
 
         self.cur.execute(sql)
@@ -297,12 +316,15 @@ class WM_Spider:
     def filter_add(self,poiId):
         self.redis.sadd(redis_filter_name,poiId)
 
+    def get_unique_id(self,**kwargs):
+        hash_str = kwargs['source_data'] + '$' + kwargs['shopname'] + '$' + kwargs['address'] + '$' + str(kwargs['address_gps_long']) + '$' + str(kwargs['address_gps_lat'])
 
+        return hashlib.md5(hash_str.encode('utf-8')).hexdigest()
 
 
 
 if __name__ == '__main__':
-    mt_wm = WM_Spider(lat='22534662',lng='113972981')
+    mt_wm = WM_Spider(lat='22601897',lng='114119860')
     cateli = ['100035','100040','100044','100038','100041','102479','100042','102481',
               '101179','100209','100213','100856','100857','100953','100858','101110',
               '100191','100849','100850','100904','100180','100238','100906','100369',
@@ -313,7 +335,7 @@ if __name__ == '__main__':
               '101789','100844','102145','102463','102464']
     # firstId 19
     yinpin_cateli = ['100837','1044','1042','100000','100838']
-    for cate in cateli[12:40]:
+    for cate in cateli[39:]:
     # for cate in yinpin_cateli:
         mt_wm.work(firstCategoryId='910',secondCategoryId=cate)
     # mt_wm.get_category('910','102011')

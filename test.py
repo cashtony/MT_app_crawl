@@ -136,3 +136,6 @@ sql = """select comments from mt_wm where shopid='856847181222725'"""
 cur.execute(sql)
 ret = cur.fetchone()[0]
 print(json.loads(ret))
+
+
+print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
