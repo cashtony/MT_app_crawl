@@ -1,3 +1,4 @@
+#coding:utf-8
 import copy
 import hashlib
 import random
@@ -86,7 +87,7 @@ class WM_Spider:
                 kwargs['business_time'] = response_json['data']['serTime']
             except:
                 kwargs['business_time'] = ['']
-            kwargs['address'] = response_json['data']['shopAddress']
+            kwargs['address'] = response_json['data']['shopAddress'].replace("'",'')
             #经纬度
             kwargs['address_gps_long'] = response_json['data']['shopLng']
             kwargs['address_gps_lat'] = response_json['data']['shopLat']
@@ -224,7 +225,7 @@ class WM_Spider:
                 kwargs['region'] = ''
         elif '区' in kwargs['address'] and '社区' not in kwargs['address']:
             try:
-                kwargs['region'] = re.findall(r'(\w{2}区)',kwargs['address'])[0]
+                kwargs['region'] = re.findall(r'(\w+区)',kwargs['address'])[0]
             except:
                 kwargs['region'] = ''
         else:
@@ -324,7 +325,7 @@ class WM_Spider:
 
 
 if __name__ == '__main__':
-    mt_wm = WM_Spider(lat='22601897',lng='114119860')
+    mt_wm = WM_Spider(lat='22777549',lng='113895342')
     cateli = ['100035','100040','100044','100038','100041','102479','100042','102481',
               '101179','100209','100213','100856','100857','100953','100858','101110',
               '100191','100849','100850','100904','100180','100238','100906','100369',
@@ -334,8 +335,8 @@ if __name__ == '__main__':
               '101979','100944','103728','101790','101980','100843','101788','100845',
               '101789','100844','102145','102463','102464']
     # firstId 19
-    yinpin_cateli = ['100837','1044','1042','100000','100838']
-    for cate in cateli[39:]:
+    # yinpin_cateli = ['100837','1044','1042','100000','100838']
+    for cate in cateli[45:]:
     # for cate in yinpin_cateli:
         mt_wm.work(firstCategoryId='910',secondCategoryId=cate)
     # mt_wm.get_category('910','102011')
