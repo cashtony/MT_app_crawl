@@ -32,7 +32,7 @@ def abuyun():
 
 def taiyang_proxy():
     resp = requests.get('http://http.tiqu.qingjuhe.cn/getip?num=1&type=1&pack=20681&port=11&lb=4&pb=45&regions=')
-    print(resp.text)
+    # print(resp.text)
     proxy =  {
         'http':'http://'+resp.text,
         'https':'https://'+resp.text

@@ -24,7 +24,7 @@ class WM_Spider:
         self.city = city_id
         self.lat = lat
         self.lng = lng
-        self.proxy = None
+        self.proxy = taiyang_proxy()
         self.index_url = 'https://i.waimai.meituan.com/openh5'
         self.headers = {
             'Host': 'i.waimai.meituan.com',
@@ -100,13 +100,19 @@ class WM_Spider:
         except:
             response_json = self.post_request(url, self.headers, payload)
             # 商家服务
-            kwargs['mark'] = response_json['data']['brandMsg'] if 'brandMsg' in response_json['data'].keys() else ''
+            try:
+                kwargs['mark'] = response_json['data']['brandMsg'] if 'brandMsg' in response_json['data'].keys() else ''
+            except:
+                kwargs['mark'] = ''
             # 营业时间
             try:
                 kwargs['business_time'] = response_json['data']['serTime']
             except:
                 kwargs['business_time'] = ['']
-            kwargs['address'] = response_json['data']['shopAddress']
+            try:
+                kwargs['address'] = response_json['data']['shopAddress'].replace("'",'')
+            except:
+                kwargs['address'] = ''
             # 经纬度
             kwargs['address_gps_long'] = response_json['data']['shopLng']
             kwargs['address_gps_lat'] = response_json['data']['shopLat']
@@ -154,7 +160,11 @@ class WM_Spider:
         #     response = requests.post(url=url,headers=headers,data=payload)
         # else:
         #     response = requests.post(url=url, headers=headers, data=payload, proxies=self.proxy)
-        response = requests.post(url=url, headers=headers, data=payload)
+        try:
+            response = requests.post(url=url, headers=headers, data=payload,proxies=self.proxy,timeout=10)
+        except:
+            self.proxy = taiyang_proxy()
+            response = requests.post(url=url, headers=headers, data=payload)
         try:
             json_response = json.loads(response.content.decode())
         except:
@@ -201,9 +211,9 @@ class WM_Spider:
                 cur_kwargs.update(comment_kwargs)
                 self.process_save_data(**cur_kwargs)
                 print('插入成功----:',shop['shopName'] + '$$$$'+ shop['mtWmPoiId'])
-                sleep(random.uniform(0.2,0.6))
+                # sleep(random.uniform(0.2,0.6))
             self.page += 1
-            sleep(random.uniform(1,1.5))
+            sleep(random.uniform(0.3,0.8))
         self.page = 1
 
 
@@ -236,7 +246,7 @@ class WM_Spider:
 
         if '市' in kwargs['address'] and '区' in kwargs['address'] and '市场' not in kwargs['address'] and '城市' not in kwargs['address']:
             try:
-                kwargs['cityname'],kwargs['region'] = re.findall(r'(?!.*省)(\w+市)(\w+?区)',kwargs['address'])[0]
+                unuse_city,kwargs['region'] = re.findall(r'(?!.*省)(\w+市)(\w+?区)',kwargs['address'])[0]
             except:
                 kwargs['region'] = ''
         elif '区' in kwargs['address'] and '社区' not in kwargs['address']:
@@ -362,7 +372,7 @@ def run():
             mt_wm.work(firstCategoryId='19', secondCategoryId=cate)
 
 if __name__ == '__main__':
-    for i in range(3):
+    for i in range(4):
         p = Process(target=run)
         p.start()
     # latlng_list = [('22515737','114069273'),('22595087','114513254'),('22629908','114425497'),('22564938','114050546'),('22695350','114216918'),('22555461','114151070'),('22539352','114494500'),('22490830','114580954'),('22689812','114348183'),('22681653','113939385'),('22771264','113844243'),('22563406','114111295'),('22567280','114130052'),('22557001','114236739'),('22544675','114570276')]
