@@ -156,10 +156,7 @@ class WM_Spider:
 
     def post_request(self,url,headers,payload):
         headers['Cookie'] = 'cityid={}; network=wifi; uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; utm_source=wandoujia; utm_medium=android; utm_term=1000000202; utm_content=861735030994726; wm_order_channel=mtjj; au_trace_key_net=default; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; terminal=i; w_utmz="utm_campaign=(direct)&utm_source=5000&utm_medium=(none)&utm_content=(none)&utm_term=(none)"; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; service-off=0; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024;'.format(self.city)+' channelType={%22mtjj%22:%220%22}; '+'w_actual_lat={lat}; w_actual_lng={lng}'.format(lat=self.lat,lng=self.lng)
-        # if self.proxy == None:
-        #     response = requests.post(url=url,headers=headers,data=payload)
-        # else:
-        #     response = requests.post(url=url, headers=headers, data=payload, proxies=self.proxy)
+
         try:
             response = requests.post(url=url, headers=headers, data=payload,proxies=self.proxy,timeout=10)
         except:
@@ -375,6 +372,7 @@ if __name__ == '__main__':
     for i in range(4):
         p = Process(target=run)
         p.start()
+        sleep(2)
     # latlng_list = [('22515737','114069273'),('22595087','114513254'),('22629908','114425497'),('22564938','114050546'),('22695350','114216918'),('22555461','114151070'),('22539352','114494500'),('22490830','114580954'),('22689812','114348183'),('22681653','113939385'),('22771264','113844243'),('22563406','114111295'),('22567280','114130052'),('22557001','114236739'),('22544675','114570276')]
     # for lat,lng in latlng_list:
     #     mt_wm = WM_Spider(lat=lat,lng=lng)

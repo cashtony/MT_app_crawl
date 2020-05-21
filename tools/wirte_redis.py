@@ -42,8 +42,13 @@ for ind,row in df.iterrows():
         row['city'] = "40"
     elif row['city'] == "深圳市":
         row['city'] = "30"
-    row['longtitude'] = int(float(row['longtitude']) * 1000000)
-    row['latitude'] = int(float(row['latitude']) * 1000000)
-    print(row['city'], row['longtitude'], row['latitude'])
-    redis_str = row['city'] + ',' + str(row['longtitude']) + ',' + str(row['latitude'])
-    redis_cli.sadd('wm_site',redis_str)
+        row['longtitude'] = int(float(row['longtitude']) * 1000000)
+        row['latitude'] = int(float(row['latitude']) * 1000000)
+        print(row['city'], row['longtitude'], row['latitude'])
+        redis_str = row['city'] + ',' + str(row['longtitude']) + ',' + str(row['latitude'])
+        redis_cli.sadd('wm_site2', redis_str)
+    # row['longtitude'] = int(float(row['longtitude']) * 1000000)
+    # row['latitude'] = int(float(row['latitude']) * 1000000)
+    # print(row['city'], row['longtitude'], row['latitude'])
+    # redis_str = row['city'] + ',' + str(row['longtitude']) + ',' + str(row['latitude'])
+    # redis_cli.sadd('wm_site',redis_str)
