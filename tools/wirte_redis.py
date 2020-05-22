@@ -1,3 +1,4 @@
+#coding:utf-8
 import pandas as pd
 from redis import Redis
 redis_cli = Redis(host='10.101.0.239',password='abc123',decode_responses=True)
