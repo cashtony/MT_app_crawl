@@ -74,4 +74,4 @@ def txt_to_redis(filename):
         print(i)
         redis_cli.sadd(redis_name,i)
 
-txt_to_redis('wm_redis')
+txt_to_redis('filter_poi')

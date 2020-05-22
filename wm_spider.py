@@ -15,9 +15,9 @@ from proxy import abuyun,taiyang_proxy
 
 redis_name = 'wm_site'
 redis_filter_name = 'filter_poi'
-conn = psycopg2.connect(database="mt_wm_test", user="postgres", password="postgres", host="127.0.0.1", port="5432")
+conn = psycopg2.connect(database="crawler", user="root", password="9TTjkHY^Y#UeLORZ", host="10.101.0.90", port="8635")
 cur = conn.cursor()
-redis = Redis(decode_responses=True)
+redis = Redis(host='10.101.0.239',password='abc123',decode_responses=True)
 class WM_Spider:
     def __init__(self,lat,lng,city_id='30'):
         self.page = 1
@@ -369,7 +369,7 @@ def run():
             mt_wm.work(firstCategoryId='19', secondCategoryId=cate)
 
 if __name__ == '__main__':
-    for i in range(4):
+    for i in range(6):
         p = Process(target=run)
         p.start()
         sleep(2)
