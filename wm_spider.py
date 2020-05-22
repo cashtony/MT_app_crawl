@@ -13,7 +13,7 @@ import json
 from redis import Redis
 from proxy import abuyun,taiyang_proxy
 
-redis_name = 'wm_site'
+redis_name = 'wm_redis'
 redis_filter_name = 'filter_poi'
 conn = psycopg2.connect(database="crawler", user="root", password="9TTjkHY^Y#UeLORZ", host="10.101.0.90", port="8635")
 cur = conn.cursor()
