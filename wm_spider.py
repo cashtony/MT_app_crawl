@@ -7,6 +7,7 @@ import re
 from datetime import datetime
 from pprint import pprint
 from time import time, sleep
+from threading import Thread
 import psycopg2
 import requests
 import json
@@ -375,8 +376,8 @@ def run():
             mt_wm.work(firstCategoryId='19', secondCategoryId=cate)
 
 if __name__ == '__main__':
-    for i in range(2):
-        p = Process(target=run)
+    for i in range(4):
+        p = Thread(target=run)
         p.start()
         sleep(2)
     # latlng_list = [('22515737','114069273'),('22595087','114513254'),('22629908','114425497'),('22564938','114050546'),('22695350','114216918'),('22555461','114151070'),('22539352','114494500'),('22490830','114580954'),('22689812','114348183'),('22681653','113939385'),('22771264','113844243'),('22563406','114111295'),('22567280','114130052'),('22557001','114236739'),('22544675','114570276')]
