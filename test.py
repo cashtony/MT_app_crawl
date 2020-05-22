@@ -177,5 +177,5 @@ cur = conn.cursor()
 sql = """select count(shopid) from mt_wm where cityname='郑州市'"""
 
 cur.execute(sql)
-data = conn.fetchall()
+data = cur.fetchall()
 print(data)
