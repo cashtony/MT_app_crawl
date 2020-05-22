@@ -1,3 +1,5 @@
+import json
+
 import psycopg2
 import pandas as pd
 
@@ -11,4 +13,9 @@ def read_sql():
 
 def pro_data(dataframe):
     for index,row in dataframe.iterrows():
-        row['']
+        # row['comments'] = json.loads(row['comments'])
+        dataframe.iloc[index,15] = str(json.loads(row['comments']))
+        print(dataframe.iloc[index,15])
+        break
+df = read_sql()
+pro_data(df)
