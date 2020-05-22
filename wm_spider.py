@@ -178,26 +178,26 @@ class WM_Spider:
         return json_response
 
     def work(self,firstCategoryId='910',secondCategoryId='101792'):
-        print('当前抓取经纬度-----------:',self.city + '&'+self.lat + '&' + self.lng)
-        print('当前抓取第二分类：',secondCategoryId)
+        # print('当前抓取经纬度-----------:',self.city + '&'+self.lat + '&' + self.lng)
+        # print('当前抓取第二分类：',secondCategoryId)
         has_next_page = True
         while has_next_page:
-            print('当前页数------:',self.page)
+            # print('当前页数------:',self.page)
             data = self.request_list_from_category(page=self.page,firstCategoryId=firstCategoryId,secondCategoryId=secondCategoryId)
             category_tags_l2_name,category_tags_l3_name = self.get_category(firstCategoryId,secondCategoryId)
             # 是否有下一页
             try:
                 has_next_page = data['data']['poiHasNextPage']
             except Exception as KeyError:
-                print('当前分类完成--------------：',secondCategoryId)
+                # print('当前分类完成--------------：',secondCategoryId)
                 break
             # 店铺列表
             for shop in data['data']['shopList']:
                 # 去重过滤
                 if self.filter_poiId(shop['mtWmPoiId']):
-                    print('这家店铺已存在-------：',shop['shopName'])
+                    # print('这家店铺已存在-------：',shop['shopName'])
                     continue
-                print('抓取店铺--------:',shop['shopName'],'$$$$',shop['mtWmPoiId'])
+                # print('抓取店铺--------:',shop['shopName'],'$$$$',shop['mtWmPoiId'])
                 cur_kwargs = {}
                 cur_kwargs['source_data'] = '美团'
                 cur_kwargs['category_tags_l1_name'] = '美食'
@@ -216,7 +216,7 @@ class WM_Spider:
                 comment_kwargs = self.request_detail_comments(poi_id=cur_kwargs['shopid'])
                 cur_kwargs.update(comment_kwargs)
                 self.process_save_data(**cur_kwargs)
-                print('插入成功----:',shop['shopName'] + '$$$$'+ shop['mtWmPoiId'])
+                # print('插入成功----:',shop['shopName'] + '$$$$'+ shop['mtWmPoiId'])
                 # sleep(random.uniform(0.2,0.6))
             self.page += 1
             sleep(random.uniform(0.3,0.8))
@@ -320,7 +320,6 @@ class WM_Spider:
 
     def get_region(self,address):
         address = address.split('路')[0] + '路' if '路' in address else address.split('街')[0] + '街'
-        print(address)
         url = 'https://map.baidu.com/su?wd={}&cid=340&type=0&t=1589457215631'.format(address)
         headers = {
         'Accept': '*/*',
