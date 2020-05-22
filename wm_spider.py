@@ -303,7 +303,6 @@ class WM_Spider:
         ON CONFLICT (id)
         DO UPDATE SET cityname='%(cityname)s',region='%(region)s',shop_score='%(shop_score)f',taste_score='%(taste_score)f',pack_score='%(pack_score)f',delivery_score='%(delivery_score)f',minimum_charge='%(minimum_charge)f',mon_sales='%(mon_sales)d',avg_speed='%(avg_speed)f',business_time='%(business_time)s',special_offer='%(special_offer)s',mark='%(mark)s',update_time='%(update_time)s',url='%(url)s';
         """ % kwargs
-        conn.ping(reconnect=True)
         cur.execute(sql)
         conn.commit()
         self.filter_add(kwargs['shopid'])
