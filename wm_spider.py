@@ -179,11 +179,11 @@ class WM_Spider:
         return json_response
 
     def work(self,firstCategoryId='910',secondCategoryId='101792'):
-        print('当前抓取经纬度-----------:',self.city + '&'+self.lat + '&' + self.lng)
-        print('当前抓取第二分类：',secondCategoryId)
+        # print('当前抓取经纬度-----------:',self.city + '&'+self.lat + '&' + self.lng)
+        # print('当前抓取第二分类：',secondCategoryId)
         has_next_page = True
         while has_next_page:
-            print('当前页数------:',self.page)
+            # print('当前页数------:',self.page)
             data = self.request_list_from_category(page=self.page,firstCategoryId=firstCategoryId,secondCategoryId=secondCategoryId)
             category_tags_l2_name,category_tags_l3_name = self.get_category(firstCategoryId,secondCategoryId)
             # 是否有下一页
@@ -196,9 +196,9 @@ class WM_Spider:
             for shop in data['data']['shopList']:
                 # 去重过滤
                 if self.filter_poiId(shop['mtWmPoiId']):
-                    print('这家店铺已存在-------：',shop['shopName'])
+                    # print('这家店铺已存在-------：',shop['shopName'])
                     continue
-                print('抓取店铺--------:',shop['shopName'],'$$$$',shop['mtWmPoiId'])
+                # print('抓取店铺--------:',shop['shopName'],'$$$$',shop['mtWmPoiId'])
                 cur_kwargs = {}
                 cur_kwargs['source_data'] = '美团'
                 cur_kwargs['category_tags_l1_name'] = '美食'
@@ -377,8 +377,8 @@ def run():
 
 if __name__ == '__main__':
     for i in range(4):
-        p = Thread(target=run)
-        p.start()
+        t = Thread(target=run)
+        t.start()
         sleep(2)
     # latlng_list = [('22515737','114069273'),('22595087','114513254'),('22629908','114425497'),('22564938','114050546'),('22695350','114216918'),('22555461','114151070'),('22539352','114494500'),('22490830','114580954'),('22689812','114348183'),('22681653','113939385'),('22771264','113844243'),('22563406','114111295'),('22567280','114130052'),('22557001','114236739'),('22544675','114570276')]
     # for lat,lng in latlng_list:
