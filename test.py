@@ -165,7 +165,17 @@ for lat,lng in latlng_list:
 #     print(str1)
 #     redis_cli.sadd('wm_site',str1)
 
-xian_latlng_list = [
-    "108.947517,34.294762","109.075219,34.317932","108.993285,34.253687","108.874577,34.274005","108.839179,34.226926",
-    "108.961961,34.276905","108.907985,34.246358","108.964176,34.218229","108.927638,34.213369",""
-]
+# xian_latlng_list = [
+#     "108.947517,34.294762","109.075219,34.317932","108.993285,34.253687","108.874577,34.274005","108.839179,34.226926",
+#     "108.961961,34.276905","108.907985,34.246358","108.964176,34.218229","108.927638,34.213369",""
+# ]
+
+
+conn = psycopg2.connect(database="crawler", user="root", password="9TTjkHY^Y#UeLORZ", host="10.101.0.90", port="8635")
+cur = conn.cursor()
+
+sql = """select count(shopid) from mt_wm where cityname='郑州市'"""
+
+cur.execute(sql)
+data = conn.fetchall()
+print(data)
