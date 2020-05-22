@@ -216,7 +216,6 @@ class WM_Spider:
                 comment_kwargs = self.request_detail_comments(poi_id=cur_kwargs['shopid'])
                 cur_kwargs.update(comment_kwargs)
                 self.process_save_data(**cur_kwargs)
-                print('插入成功----:',shop['shopName'] + '$$$$'+ shop['mtWmPoiId'])
                 # sleep(random.uniform(0.2,0.6))
             self.page += 1
             sleep(random.uniform(0.3,0.8))
@@ -306,6 +305,7 @@ class WM_Spider:
         cur.execute(sql)
         conn.commit()
         self.filter_add(kwargs['shopid'])
+        print('插入成功----:', kwargs['shopname'] + '$$$$' + kwargs['shopid'])
 
 
 
@@ -375,7 +375,7 @@ def run():
             mt_wm.work(firstCategoryId='19', secondCategoryId=cate)
 
 if __name__ == '__main__':
-    for i in range(1):
+    for i in range(2):
         p = Process(target=run)
         p.start()
         sleep(2)
