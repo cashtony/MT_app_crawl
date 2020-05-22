@@ -12,6 +12,14 @@ import requests
 import json
 from redis import Redis
 from proxy import abuyun,taiyang_proxy
+import logging
+
+logging.basicConfig(level=logging.ERROR,
+                    format="%(asctime)s %(name)s %(levelname)s %(message)s",
+                    datefmt = '%Y-%m-%d  %H:%M:%S %a',    #注意月份和天数不要搞乱了，这里的格式化符与time模块相同
+                    filename='wm_spider.log',
+                    filemode='a'
+                    )
 
 redis_name = 'wm_redis'
 redis_filter_name = 'filter_poi'
@@ -164,7 +172,8 @@ class WM_Spider:
             response = requests.post(url=url, headers=headers, data=payload)
         try:
             json_response = json.loads(response.content.decode())
-        except:
+        except Exception as e:
+            logging.error(e)
             return {}
         return json_response
 
@@ -369,7 +378,7 @@ def run():
             mt_wm.work(firstCategoryId='19', secondCategoryId=cate)
 
 if __name__ == '__main__':
-    for i in range(1):
+    for i in range(6):
         p = Process(target=run)
         p.start()
         sleep(2)
