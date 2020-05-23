@@ -262,6 +262,8 @@ class WM_Spider:
                 kwargs['region'] = ''
         else:
             kwargs['region'] = ''
+        if len(kwargs['region']) >= 10:
+            kwargs['region'] = ''
         kwargs['cityname'] = kwargs['cityname'] if '市' in kwargs['cityname'] else kwargs['cityname'] + '市'
         # 分数
         kwargs['shop_score'] = float('%.2f' % (int(kwargs['shop_score']) / 10))
