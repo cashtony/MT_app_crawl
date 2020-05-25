@@ -104,12 +104,8 @@ class WM_Spider:
                 kwargs['business_time'] = ['']
             kwargs['address'] = response_json['data']['shopAddress'].replace("'",'')
             #经纬度
-            try:
-                kwargs['address_gps_long'] = response_json['data']['shopLng']
-                kwargs['address_gps_lat'] = response_json['data']['shopLat']
-            except:
-                kwargs['address_gps_long'] = 0
-                kwargs['address_gps_lat'] = 0
+            kwargs['address_gps_long'] = response_json['data']['shopLng']
+            kwargs['address_gps_lat'] = response_json['data']['shopLat']
         except:
             response_json = self.post_request(url, self.headers, payload)
             # 商家服务
@@ -127,8 +123,12 @@ class WM_Spider:
             except:
                 kwargs['address'] = ''
             # 经纬度
-            kwargs['address_gps_long'] = response_json['data']['shopLng']
-            kwargs['address_gps_lat'] = response_json['data']['shopLat']
+            try:
+                kwargs['address_gps_long'] = response_json['data']['shopLng']
+                kwargs['address_gps_lat'] = response_json['data']['shopLat']
+            except:
+                kwargs['address_gps_long'] = 0
+                kwargs['address_gps_lat'] = 0
         return kwargs
 
 
