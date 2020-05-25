@@ -104,8 +104,12 @@ class WM_Spider:
                 kwargs['business_time'] = ['']
             kwargs['address'] = response_json['data']['shopAddress'].replace("'",'')
             #经纬度
-            kwargs['address_gps_long'] = response_json['data']['shopLng']
-            kwargs['address_gps_lat'] = response_json['data']['shopLat']
+            try:
+                kwargs['address_gps_long'] = response_json['data']['shopLng']
+                kwargs['address_gps_lat'] = response_json['data']['shopLat']
+            except:
+                kwargs['address_gps_long'] = 0
+                kwargs['address_gps_lat'] = 0
         except:
             response_json = self.post_request(url, self.headers, payload)
             # 商家服务
@@ -268,8 +272,9 @@ class WM_Spider:
         # 分数
         kwargs['shop_score'] = float('%.2f' % (int(kwargs['shop_score']) / 10))
         # 经纬度
-        kwargs['address_gps_lat'] = str(float('%.7f' % kwargs['address_gps_lat']) / 1000000)
-        kwargs['address_gps_long'] = str(float('%.7f' % kwargs['address_gps_long']) / 1000000)
+        if kwargs['address_gps_lat'] != 0 and kwargs['address_gps_long'] != 0:
+            kwargs['address_gps_lat'] = str(float('%.7f' % kwargs['address_gps_lat']) / 1000000)
+            kwargs['address_gps_long'] = str(float('%.7f' % kwargs['address_gps_long']) / 1000000)
 
         # 人均
         try:

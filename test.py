@@ -171,11 +171,12 @@ for lat,lng in latlng_list:
 # ]
 
 
-conn = psycopg2.connect(database="crawler", user="root", password="9TTjkHY^Y#UeLORZ", host="10.101.0.90", port="8635")
-cur = conn.cursor()
+# conn = psycopg2.connect(database="crawler", user="root", password="9TTjkHY^Y#UeLORZ", host="10.101.0.90", port="8635")
+# cur = conn.cursor()
+#
+# sql = """select count(shopid) from mt_wm where cityname='郑州市'"""
+#
+# cur.execute(sql)
+# data = cur.fetchall()
+# print(data)
 
-sql = """select count(shopid) from mt_wm where cityname='郑州市'"""
-
-cur.execute(sql)
-data = cur.fetchall()
-print(data)
