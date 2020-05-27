@@ -26,20 +26,20 @@ logging.basicConfig(level=logging.ERROR,
                     )
 
 # 线上
-# redis_name = 'wm_redis'
+redis_name = 'wm_redis'
 # 本地
-redis_name = 'wm_site2'
+# redis_name = 'wm_site2'
 redis_filter_name = 'filter_poi'
 # 线上
-# conn = psycopg2.connect(database="crawler", user="root", password="9TTjkHY^Y#UeLORZ", host="10.101.0.90", port="8635")
+conn = psycopg2.connect(database="crawler", user="root", password="9TTjkHY^Y#UeLORZ", host="10.101.0.90", port="8635")
 # 本地
-conn = psycopg2.connect(database="mt_wm_test", user="postgres", password="postgres", host="localhost", port="8635")
+# conn = psycopg2.connect(database="mt_wm_test", user="postgres", password="postgres", host="localhost", port="8635")
 
 cur = conn.cursor()
 # 线上
-# redis = Redis(host='10.101.0.239',password='abc123',decode_responses=True)
+redis = Redis(host='10.101.0.239',password='abc123',decode_responses=True)
 # 本地
-redis = Redis(decode_responses=True)
+# redis = Redis(decode_responses=True)
 class WM_Spider:
     def __init__(self,lat,lng,city_id='30'):
         self.page = 1
