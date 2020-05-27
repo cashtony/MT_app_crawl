@@ -65,7 +65,7 @@ class WM_Spider:
         }
         payload = 'startIndex={startIndex}&navigateType=910&firstCategoryId={firstCategoryId}&secondCategoryId={secondCategoryId}&geoType=2&platform=3&partner=4&originUrl=https://h5.waimai.meituan.com/waimai/mindex/kingkong?navigateType=910&firstCategoryId=910&secondCategoryId=910&title=%E7%BE%8E%E9%A3%9F&riskLevel=71&optimusCode=10&wm_actual_latitude={wm_actual_latitude}&wm_actual_longitude={wm_actual_longitude}&openh5_uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC'.format_map(kwargs)
 
-        url = self.index_url + last_url + '?_=' + str(int(time() * 1000))
+        url = self.index_url + last_url + '?_=' + str(int(time() * 1000) - 10000)
 
         response_json = self.post_request(url,self.headers,payload)
         print(response_json)
@@ -178,6 +178,7 @@ class WM_Spider:
 
         try:
             response = requests.post(url=url, headers=headers, data=payload,proxies=self.proxy,timeout=10,verify=False)
+            print(response.content.decode())
         except:
             self.proxy = taiyang_proxy()
             response = requests.post(url=url, headers=headers, data=payload,verify=False)
