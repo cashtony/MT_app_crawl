@@ -1,8 +1,10 @@
 #coding:utf-8
+import random
+
 import pandas as pd
 from redis import Redis
-redis_cli = Redis(host='10.101.0.239',password='abc123',decode_responses=True)
-
+# redis_cli = Redis(host='10.101.0.239',password='abc123',decode_responses=True)
+redis_cli = Redis(decode_responses=True)
 def csv_to_redis():
     filepath = 'D:/work/geohash1.csv'
     df = pd.read_csv(filepath,encoding='gbk')
@@ -73,6 +75,13 @@ def txt_to_redis(filename):
     for i in content:
         print(i)
         redis_cli.sadd(redis_name,i)
+
+def wirte_phoneUa():
+    with open('../ua.txt','r',encoding='utf-8') as f:
+        ua_list = f.read().split('\n')
+    print(random.choice(ua_list))
+
+# wirte_phoneUa()
 
 # txt_to_redis('filter_poi')
 

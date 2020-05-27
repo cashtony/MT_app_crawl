@@ -15,7 +15,7 @@ headers = {
     'Accept': 'application/json',
     'Origin': 'https://h5.waimai.meituan.com',
     # 'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0.1; Redmi Note 3 Build/MMB29M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.91 Mobile Safari/537.36 TitansX/11.19.6 KNB/1.2.0 android/6.0.1 mt/com.sankuai.meituan/10.0.202 App/10120/10.0.202 MeituanGroup/10.0.202',
-    'User-Agent':'AiMeiTuan /Meizu-5.1-MX4-1920x1152-480-10.8.404-1000080404-862095026057122-meizu4',
+    'User-Agent':'Mozilla/5.0 (iPhone 6sp; CPU iPhone OS 10_2 like Mac OS X) AppleWebKit/602.3.12 (KHTML, like Gecko) Version/10.0 MQQBrowser/7.7.1 Mobile/14C92 Safari/8536.25 MttCustomUA/2 QBWebViewType/1 WKType/1',
     'Referer': 'https://h5.waimai.meituan.com/waimai/mindex/menu?dpShopId=&mtShopId=1112840116809435&utm_source=wandoujia&channel=mtjj&source=shoplist&initialLat=22.544568&initialLng=113.949059&actualLat=22.544568&actualLng=113.949059',
     'Accept-Encoding': 'gzip, deflate',
     'Accept-Language': 'zh-CN,en-US;q=0.9',
@@ -59,12 +59,12 @@ payload = 'shopId=0&mtWmPoiId=943382183119710&startIndex=0&platform=3&partner=4&
 ### 列表页 根据商品分类 手机请求 用
 url = 'https://i.waimai.meituan.com/openh5/channel/kingkongshoplist?_=1589461806277'
 
-payload = 'startIndex=0&navigateType=910&firstCategoryId=910&secondCategoryId=100321&geoType=2&platform=3&partner=4&originUrl=https://h5.waimai.meituan.com/waimai/mindex/kingkong?navigateType=910&firstCategoryId=910&secondCategoryId=910&title=%E7%BE%8E%E9%A3%9F&riskLevel=71&optimusCode=10&wm_actual_latitude=22544568&wm_actual_longitude=113949059&openh5_uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC'
+payload = 'startIndex=0&navigateType=910&firstCategoryId=910&secondCategoryId=100321&geoType=2&platform=3&partner=4&riskLevel=71&optimusCode=10&wm_actual_latitude=22544568&wm_actual_longitude=113949059&openh5_uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC'
 
 # headers['Cookie'] = 'cityid=30; network=wifi; uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC; utm_source=wandoujia; utm_medium=android; utm_term=1000000202; utm_content=862095026057122; wm_order_channel=mtjj; au_trace_key_net=default; openh5_uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC; terminal=i; w_utmz="utm_campaign=(direct)&utm_source=5000&utm_medium=(none)&utm_content=(none)&utm_term=(none)"; openh5_uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC; service-off=0; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024; channelType={%22mtjj%22:%220%22}; w_actual_lat=22546510; w_actual_lng=113948770'
-resp = requests.post(url,headers=headers,data=payload,proxies={'http': 'http://182.109.184.209:4345\n', 'https': 'https://182.109.184.209:4345\n'})
-json_resp = pro(resp)
-print(resp.text)
+# resp = requests.post(url,headers=headers,data=payload,proxies=taiyang_proxy())
+# json_resp = pro(resp)
+# print(resp.text)
 
 
 

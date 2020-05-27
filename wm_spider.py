@@ -53,7 +53,7 @@ class WM_Spider:
             'Accept': 'application/json',
             'Origin': 'https://h5.waimai.meituan.com',
             # 'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0.1; Redmi Note 3 Build/MMB29M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.91 Mobile Safari/537.36 TitansX/11.19.6 KNB/1.2.0 android/6.0.1 mt/com.sankuai.meituan/10.0.202 App/10120/10.0.202 MeituanGroup/10.0.202',
-            'User-Agent': 'AiMeiTuan /Meizu-5.1-MX4-1920x1152-480-10.8.404-1000080404-862095026057122-meizu4',
+            'User-Agent': self.get_ua(),
             'Referer': 'https://h5.waimai.meituan.com/waimai/mindex/menu?dpShopId=&mtShopId=1112840116809435&utm_source=wandoujia&channel=mtjj&source=shoplist&initialLat=22.544568&initialLng=113.949059&actualLat=22.544568&actualLng=113.949059',
             'Accept-Encoding': 'gzip, deflate',
             'Accept-Language': 'zh-CN,en-US;q=0.9',
@@ -109,6 +109,7 @@ class WM_Spider:
             if '热销' in food_category['categoryName']:
                 hot_foods.append(food_category)
         return json.dumps(hot_foods).replace("'",'')
+
     # 'https://i.waimai.meituan.com/openh5/poi/info?_=1589277696918'
     def request_detail_info(self,poi_id,last_url='/poi/info'):
         headers = copy.deepcopy(self.headers)
@@ -205,9 +206,9 @@ class WM_Spider:
         try:
             response = requests.post(url=url, headers=headers, data=payload,proxies=self.proxy,timeout=10)
             if '登录' in response.content.decode():
-                self.proxy = taiyang_proxy()
+                self.headers['User-Agent'] = self.get_ua()
         except:
-            # self.proxy = taiyang_proxy()
+            self.proxy = taiyang_proxy()
             response = requests.post(url=url, headers=headers, data=payload)
         print(response.content.decode())
         try:
@@ -412,6 +413,10 @@ class WM_Spider:
             data = json.loads(f.read())
         return data[self.city]
 
+    def get_ua(self):
+        with open('ua.txt', 'r', encoding='utf-8') as f:
+            ua_list = f.read().split('\n')
+        return random.choice(ua_list)
 def run():
     while True:
         wm_args = redis.spop(redis_name)
