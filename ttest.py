@@ -91,5 +91,4 @@ payload = 'geoType=2&mtWmPoiId=1083746008377954&source=searchresult&platform=3&p
 url = 'https://i.waimai.meituan.com/external/poi/1030333795405299?utm_source=5913&amp;wmi_from=cpoiinfo&amp;user_id=2599273935'
 
 """
-
-"""
+Cookie: _lxsdk_cuid=1725440c0da2-08336aca1-5a10162d-3c000-1725440c0dc62; _lxsdk=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC; _lxsdk_unoinid=0ca77ead48c848dd9d41d6adeff492950000000000000960801; logan_session_token=o31gam4i2v9no6zlkqpg; w_visitid=885ea826-15be-4b05-aa72-caa705bbf927;"""
