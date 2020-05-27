@@ -258,9 +258,9 @@ class WM_Spider:
                 comment_kwargs = self.request_detail_comments(poi_id=cur_kwargs['shopid'])
                 cur_kwargs.update(comment_kwargs)
                 self.process_save_data(**cur_kwargs)
-                sleep(random.uniform(0.2,0.4))
+                # sleep(random.uniform(0.2,0.4))
             self.page += 1
-            # sleep(random.uniform(0.3,0.8))
+            sleep(random.uniform(0.3,0.5))
         self.page = 1
 
 
@@ -430,7 +430,7 @@ def run():
             mt_wm.work(firstCategoryId='19', secondCategoryId=cate)
 
 if __name__ == '__main__':
-    for i in range(1):
+    for i in range(4):
         t = Thread(target=run)
         t.start()
         sleep(2)
