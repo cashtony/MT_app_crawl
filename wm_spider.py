@@ -26,22 +26,22 @@ logging.basicConfig(level=logging.ERROR,
                     )
 
 # 线上
-redis_name = 'wm_redis'
+# redis_name = 'wm_redis'
 # 本地
-# redis_name = 'wm_site2'
+redis_name = 'wm_site2'
 redis_filter_name = 'filter_poi'
 # 线上
-conn = psycopg2.connect(database="crawler", user="root", password="9TTjkHY^Y#UeLORZ", host="10.101.0.90", port="8635")
+# conn = psycopg2.connect(database="crawler", user="root", password="9TTjkHY^Y#UeLORZ", host="10.101.0.90", port="8635")
 # 本地
-# conn = psycopg2.connect(database="mt_wm_test", user="postgres", password="postgres", host="localhost", port="8635")
+conn = psycopg2.connect(database="mt_wm_test", user="postgres", password="postgres", host="localhost", port="8635")
 
 cur = conn.cursor()
 # 线上
-redis = Redis(host='10.101.0.239',password='abc123',decode_responses=True)
+# redis = Redis(host='10.101.0.239',password='abc123',decode_responses=True)
 # 本地
-# redis = Redis(decode_responses=True)
+redis = Redis(decode_responses=True)
 class WM_Spider:
-    def __init__(self,lat,lng,city_id='30'):
+    def __init__(self,lat,lng,city_id):
         self.page = 1
         self.city = city_id
         self.lat = lat
@@ -53,11 +53,11 @@ class WM_Spider:
             'Accept': 'application/json',
             'Origin': 'https://h5.waimai.meituan.com',
             # 'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0.1; Redmi Note 3 Build/MMB29M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.91 Mobile Safari/537.36 TitansX/11.19.6 KNB/1.2.0 android/6.0.1 mt/com.sankuai.meituan/10.0.202 App/10120/10.0.202 MeituanGroup/10.0.202',
-            'User-Agent': self.get_ua(),
+            'User-Agent': 'Mozilla/5.0 (Linux; U; Android 6.0; zh-cn; CAM-UL00 Build/HONORCAM-UL00) AppleWebKit/537.36 (KHTML, like Gecko)Version/4.0 Chrome/37.0.0.0 MQQBrowser/6.0 Mobile Safari/537.36',
             'Referer': 'https://h5.waimai.meituan.com/waimai/mindex/menu?dpShopId=&mtShopId=1112840116809435&utm_source=wandoujia&channel=mtjj&source=shoplist&initialLat=22.544568&initialLng=113.949059&actualLat=22.544568&actualLng=113.949059',
             'Accept-Encoding': 'gzip, deflate',
             'Accept-Language': 'zh-CN,en-US;q=0.9',
-            'Cookie':f'cityid={city_id}; network=wifi; utm_source=meizu4; utm_medium=android; utm_term=1000000202; utm_content=862095026057122; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024__e84675; wm_order_channel=mtjj; au_trace_key_net=default; openh5_uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC; uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC; service-off=0; terminal=i; w_actual_lat={self.lat}; w_actual_lng={self.lng}; openh5_uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC',
+            'Cookie': 'cityid=30; network=wifi; utm_source=meizu4; utm_medium=android; utm_term=1000000202; utm_content=862095026057122; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024; wm_order_channel=mtjj; au_trace_key_net=default; openh5_uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC; channelType=%7b%22mtjj%22%3a%220%22%7d;',
             'X-Requested-With': 'com.sankuai.meituan',
             'Content-Type': 'application/x-www-form-urlencoded',
             'Connection': 'keep-alive',
@@ -65,35 +65,32 @@ class WM_Spider:
 
     # 'https://i.waimai.meituan.com/openh5/channel/kingkongshoplist?_=1589286163907'
     def request_list_from_category(self,firstCategoryId,secondCategoryId,page,last_url='/channel/kingkongshoplist'):
+        headers = copy.deepcopy(self.headers)
 
-        kwargs = {
-            'startIndex': str(int(page) - 1),
-            'firstCategoryId':firstCategoryId,
-            'secondCategoryId':secondCategoryId,
-            'wm_actual_latitude':self.lat,
-            'wm_actual_longitude':self.lng
-        }
-        payload = 'startIndex={startIndex}&sortId=&navigateType=910&firstCategoryId={firstCategoryId}&secondCategoryId={secondCategoryId}&geoType=2&rankTraceId=&uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC&platform=3&partner=4&riskLevel=71&optimusCode=10&wm_actual_latitude={wm_actual_latitude}&wm_actual_longitude={wm_actual_longitude}&openh5_uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC'.format_map(kwargs)
+        headers['Cookie'] = f'cityid={self.city}; network=wifi; utm_medium=android; utm_term=1000000202; utm_content=862095026057122; _lxsdk_cuid=1725440c0da2-08336aca1-5a10162d-3c000-1725440c0dc62; _lxsdk=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC; _lxsdk_s=1725440c0e0-f28-0db-5e0%7C-1%7CNaN;'
+
+        payload = f'startIndex={str(int(page) - 1)}&navigateType=910&firstCategoryId={firstCategoryId}&secondCategoryId={secondCategoryId}&geoType=2&platform=3&partner=4&riskLevel=71&optimusCode=10&wm_actual_latitude={self.lat}&wm_actual_longitude={self.lng}&openh5_uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC'
 
         url = self.index_url + last_url + '?_=' + str(int(time() * 1000))
-        # print('列表页----')
-        # print(url)
-        # print(self.headers['Cookie'])
-        # print(payload)
-        response_json = self.post_request(url,self.headers,payload)
+        print('列表页----')
+        print(url)
+        print(headers['Cookie'])
+        print(payload)
+        response_json = self.post_request(url,headers,payload)
         return response_json
 
     # 'https://i.waimai.meituan.com/openh5/poi/food?_=1589277696918'
     def request_detail_food(self,poi_id,last_url='/poi/food'):
         headers = copy.deepcopy(self.headers)
-        headers['Cookie'] = f'cityid={self.city}; network=wifi; utm_source=meizu4; utm_medium=android; utm_term=1000000202; utm_content=862095026057122; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024; wm_order_channel=mtjj; au_trace_key_net=default; _lx_utm=utm_source%3D60374%26utm_medium%3Dandroid%26utm_term%3D1000000202%26utm_content%3D862095026057122%26utm_campaign%3DAgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024; _lxsdk_cuid=1725440c0da2-08336aca1-5a10162d-3c000-1725440c0dc62; _lxsdk_s=1725440c0e0-f28-0db-5e0%7C-1%7CNaN; _lxsdk=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC; _lxsdk_unoinid=0ca77ead48c848dd9d41d6adeff492950000000000000960801; openh5_uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC; uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC; w_visitid=5c32fc19-675b-4a73-bdcd-8ea5f2d22df7; logan_session_token=o31gam4i2v9no6zlkqpg; logan_custom_report=; service-off=0; terminal=i; w_utmz="utm_campaign=(direct)&utm_source=5000&utm_medium=(none)&utm_content=(none)&utm_term=(none)"; w_latlng=0,0; w_actual_lat={self.lat}; w_actual_lng={self.lng}; openh5_uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC'
-        payload = f'geoType=2&mtWmPoiId={poi_id}&dpShopId=-1&source=shoplist&skuId=&uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC&platform=3&partner=4&riskLevel=71&optimusCode=10&wm_actual_latitude={self.lat}&wm_actual_longitude={self.lng}&openh5_uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC'
+        headers['Cookie'] = f'cityid={self.city}; network=wifi; utm_medium=android; utm_content=862095026057122; _lxsdk_cuid=1725440c0da2-08336aca1-5a10162d-3c000-1725440c0dc62;'
+        headers['User_Agent'] = self.get_ua()
+        payload = f'mtWmPoiId={poi_id}&openh5_uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC&dpShopId=-1&source=shoplist'
 
-        url = self.index_url + last_url + '?_=' + str(int(time() * 1000))
-        # print('食品页-----')
-        # print(url)
-        # print(headers['Cookie'])
-        # print(payload)
+        url = self.index_url + last_url + '?_=' + '1590565792589&' #str(int(time() * 1000))
+        print('食品页-----')
+        print(url)
+        print(headers['Cookie'])
+        print(payload)
         response_json = self.post_request(url,self.headers,payload)
         try:
             food_category_list = response_json['data']['categoryList']
@@ -113,14 +110,15 @@ class WM_Spider:
     # 'https://i.waimai.meituan.com/openh5/poi/info?_=1589277696918'
     def request_detail_info(self,poi_id,last_url='/poi/info'):
         headers = copy.deepcopy(self.headers)
-        headers['Cookie'] = f'cityid={self.city}; network=wifi; utm_source=meizu4; utm_medium=android; utm_term=1000000202; utm_content=862095026057122; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024; wm_order_channel=mtjj; au_trace_key_net=default; _lx_utm=utm_source%3D60374%26utm_medium%3Dandroid%26utm_term%3D1000000202%26utm_content%3D862095026057122%26utm_campaign%3DAgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024; _lxsdk_cuid=1725440c0da2-08336aca1-5a10162d-3c000-1725440c0dc62; _lxsdk_s=1725440c0e0-f28-0db-5e0%7C-1%7CNaN; _lxsdk=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC; _lxsdk_unoinid=0ca77ead48c848dd9d41d6adeff492950000000000000960801; openh5_uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC; uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC; w_visitid=5c32fc19-675b-4a73-bdcd-8ea5f2d22df7; logan_session_token=o31gam4i2v9no6zlkqpg; logan_custom_report=; service-off=0; terminal=i; w_utmz="utm_campaign=(direct)&utm_source=5000&utm_medium=(none)&utm_content=(none)&utm_term=(none)"; w_latlng=0,0; w_actual_lat={self.lat}; w_actual_lng={self.lng}; openh5_uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC'
-
+        headers['Cookie'] = f'cityid={self.city}; network=wifi; utm_medium=android; utm_term=1000000202; utm_content=862095026057122; uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC; openh5_uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC'
+        headers['User_Agent'] = self.get_ua()
+        print(headers['User_Agent'])
         payload = f'shopId=0&mtWmPoiId={poi_id}&source=shoplist&channel=6&uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC&platform=3&partner=4&riskLevel=71&optimusCode=10&wm_actual_latitude={self.lat}&wm_actual_longitude={self.lng}&openh5_uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC'
         url = self.index_url + last_url + '?_=' + str(int(time() * 1000))
-        # print('商店详情页----')
-        # print(url)
-        # print(headers['Cookie'])
-        # print(payload)
+        print('商店详情页----')
+        print(url)
+        print(headers['Cookie'])
+        print(payload)
         response_json = self.post_request(url,self.headers,payload)
         kwargs = {}
         try:
@@ -204,12 +202,12 @@ class WM_Spider:
         # headers['Cookie'] = 'cityid={}; network=wifi; uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; utm_source=wandoujia; utm_medium=android; utm_term=1000000202; utm_content=861735030994726; wm_order_channel=mtjj; au_trace_key_net=default; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; terminal=i; w_utmz="utm_campaign=(direct)&utm_source=5000&utm_medium=(none)&utm_content=(none)&utm_term=(none)"; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; service-off=0; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024;'.format(self.city)+' channelType={%22mtjj%22:%220%22}; '+'w_actual_lat={lat}; w_actual_lng={lng}'.format(lat=self.lat,lng=self.lng)
 
         try:
-            response = requests.post(url=url, headers=headers, data=payload,proxies=self.proxy,timeout=10)
-            if '登录' in response.content.decode():
-                self.headers['User-Agent'] = self.get_ua()
+            response = requests.post(url=url, headers=headers, data=payload,verify=False)
+            # if '登录' in response.content.decode():
+            #     self.headers['User-Agent'] = self.get_ua()
         except:
             self.proxy = taiyang_proxy()
-            response = requests.post(url=url, headers=headers, data=payload)
+            response = requests.post(url=url, headers=headers, data=payload,verify=False)
         print(response.content.decode())
         try:
             json_response = json.loads(response.content.decode())
@@ -219,8 +217,8 @@ class WM_Spider:
         return json_response
 
     def work(self,firstCategoryId='910',secondCategoryId='101792'):
-        # print('当前抓取经纬度-----------:',self.city + '&'+self.lat + '&' + self.lng)
-        # print('当前抓取第二分类：',secondCategoryId)
+        print('当前抓取经纬度-----------:',self.city + '&'+self.lat + '&' + self.lng)
+        print('当前抓取第二分类：',secondCategoryId)
         has_next_page = True
         while has_next_page:
             # print('当前页数------:',self.page)
@@ -248,21 +246,21 @@ class WM_Spider:
                 shop_kwargs = self.process_shop_data(shop)
                 cur_kwargs.update(shop_kwargs)
                 # 获取商品信息 返回字符串 热销
-
-                hot_foods = self.request_detail_food(poi_id=cur_kwargs['shopid'])
-                cur_kwargs['popular_dishes'] = hot_foods
+                sleep(3)
+                # hot_foods = self.request_detail_food(poi_id=cur_kwargs['shopid'])
+                # cur_kwargs['popular_dishes'] = hot_foods
                 # # 获取商铺信息
-
+                sleep(1)
                 info_kwargs = self.request_detail_info(poi_id=cur_kwargs['shopid'])
                 cur_kwargs.update(info_kwargs)
                 # # 获取商铺评论
-
+                sleep(1)
                 comment_kwargs = self.request_detail_comments(poi_id=cur_kwargs['shopid'])
                 cur_kwargs.update(comment_kwargs)
                 self.process_save_data(**cur_kwargs)
-                # sleep(random.uniform(0.2,0.4))
+                sleep(random.uniform(1,2))
             self.page += 1
-            sleep(random.uniform(0.3,0.5))
+            sleep(random.uniform(2,3))
         self.page = 1
 
 
@@ -430,16 +428,18 @@ def run():
                   '101788', '100845', '101789', '100844', '102145',
                   '102463', '102464']
         for cate in cateli:
+            sleep(2)
             mt_wm.work(firstCategoryId='910', secondCategoryId=cate)
         yinpin_cateli = ['100837', '1044', '1042', '100000', '100838']
         for cate in yinpin_cateli:
             mt_wm.work(firstCategoryId='19', secondCategoryId=cate)
 
 if __name__ == '__main__':
-    for i in range(1):
-        t = Thread(target=run)
-        t.start()
-        sleep(2)
+    run()
+    # for i in range(1):
+    #     t = Thread(target=run)
+    #     t.start()
+    #     sleep(2)
     # latlng_list = [('22515737','114069273'),('22595087','114513254'),('22629908','114425497'),('22564938','114050546'),('22695350','114216918'),('22555461','114151070'),('22539352','114494500'),('22490830','114580954'),('22689812','114348183'),('22681653','113939385'),('22771264','113844243'),('22563406','114111295'),('22567280','114130052'),('22557001','114236739'),('22544675','114570276')]
     # for lat,lng in latlng_list:
     #     mt_wm = WM_Spider(lat=lat,lng=lng)
