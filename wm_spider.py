@@ -46,7 +46,7 @@ class WM_Spider:
             'Referer': 'https://h5.waimai.meituan.com/waimai/mindex/menu?dpShopId=&mtShopId=1112840116809435&utm_source=wandoujia&channel=mtjj&source=shoplist&initialLat=22.544568&initialLng=113.949059&actualLat=22.544568&actualLng=113.949059',
             'Accept-Encoding': 'gzip, deflate',
             'Accept-Language': 'zh-CN,en-US;q=0.9',
-            'Cookie': 'cityid=[city_id]; network=wifi; utm_source=meizu4; utm_medium=android; utm_term=1000000202; utm_content=862095026057122; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024; wm_order_channel=mtjj; au_trace_key_net=default; openh5_uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC; channelType=%7b%22mtjj%22%3a%220%22%7d; w_actual_lat={lat}; w_actual_lng={lng}'.format(city_id=city_id,lat=lat,lng=lng),
+            'Cookie': 'cityid={city_id}; network=wifi; utm_source=meizu4; utm_medium=android; utm_term=1000000202; utm_content=862095026057122; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024; wm_order_channel=mtjj; au_trace_key_net=default; openh5_uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC; channelType=%7b%22mtjj%22%3a%220%22%7d; w_actual_lat={lat}; w_actual_lng={lng}'.format(city_id=city_id,lat=lat,lng=lng),
             'X-Requested-With': 'com.sankuai.meituan',
             'Content-Type': 'application/x-www-form-urlencoded',
             'Connection': 'keep-alive',
@@ -171,7 +171,7 @@ class WM_Spider:
 
 
     def post_request(self,url,headers,payload):
-        headers['Cookie'] = 'cityid={}; network=wifi; uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; utm_source=wandoujia; utm_medium=android; utm_term=1000000202; utm_content=861735030994726; wm_order_channel=mtjj; au_trace_key_net=default; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; terminal=i; w_utmz="utm_campaign=(direct)&utm_source=5000&utm_medium=(none)&utm_content=(none)&utm_term=(none)"; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; service-off=0; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024;'.format(self.city)+' channelType={%22mtjj%22:%220%22}; '+'w_actual_lat={lat}; w_actual_lng={lng}'.format(lat=self.lat,lng=self.lng)
+        # headers['Cookie'] = 'cityid={}; network=wifi; uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; utm_source=wandoujia; utm_medium=android; utm_term=1000000202; utm_content=861735030994726; wm_order_channel=mtjj; au_trace_key_net=default; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; terminal=i; w_utmz="utm_campaign=(direct)&utm_source=5000&utm_medium=(none)&utm_content=(none)&utm_term=(none)"; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; service-off=0; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024;'.format(self.city)+' channelType={%22mtjj%22:%220%22}; '+'w_actual_lat={lat}; w_actual_lng={lng}'.format(lat=self.lat,lng=self.lng)
 
         try:
             response = requests.post(url=url, headers=headers, data=payload,proxies=self.proxy,timeout=10,verify=False)
@@ -370,8 +370,7 @@ class WM_Spider:
 
 def run():
     while True:
-        # wm_args = redis.spop(redis_name)
-        wm_args = "60,120130005,35966491"
+        wm_args = redis.spop(redis_name)
         city_id = wm_args.split(',')[0]
         lat = wm_args.split(',')[2]
         lng = wm_args.split(',')[1]
@@ -388,7 +387,7 @@ def run():
             mt_wm.work(firstCategoryId='19', secondCategoryId=cate)
 
 if __name__ == '__main__':
-    for i in range(1):
+    for i in range(4):
         t = Thread(target=run)
         t.start()
         sleep(2)
