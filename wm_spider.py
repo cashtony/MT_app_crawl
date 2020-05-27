@@ -177,6 +177,7 @@ class WM_Spider:
         # headers['Cookie'] = 'cityid={}; network=wifi; uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; utm_source=wandoujia; utm_medium=android; utm_term=1000000202; utm_content=861735030994726; wm_order_channel=mtjj; au_trace_key_net=default; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; terminal=i; w_utmz="utm_campaign=(direct)&utm_source=5000&utm_medium=(none)&utm_content=(none)&utm_term=(none)"; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; service-off=0; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024;'.format(self.city)+' channelType={%22mtjj%22:%220%22}; '+'w_actual_lat={lat}; w_actual_lng={lng}'.format(lat=self.lat,lng=self.lng)
 
         try:
+            print(self.proxy)
             response = requests.post(url=url, headers=headers, data=payload,proxies=self.proxy,timeout=10)
             print(response.content.decode())
         except:
