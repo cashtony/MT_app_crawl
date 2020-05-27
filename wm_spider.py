@@ -207,8 +207,9 @@ class WM_Spider:
             if '登录' in response.content.decode():
                 self.proxy = taiyang_proxy()
         except:
-            self.proxy = taiyang_proxy()
+            # self.proxy = taiyang_proxy()
             response = requests.post(url=url, headers=headers, data=payload)
+        print(response.content.decode())
         try:
             json_response = json.loads(response.content.decode())
         except Exception as e:
@@ -430,7 +431,7 @@ def run():
             mt_wm.work(firstCategoryId='19', secondCategoryId=cate)
 
 if __name__ == '__main__':
-    for i in range(4):
+    for i in range(1):
         t = Thread(target=run)
         t.start()
         sleep(2)
