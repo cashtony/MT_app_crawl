@@ -223,7 +223,6 @@ class WM_Spider:
                 # # 获取商铺评论
                 comment_kwargs = self.request_detail_comments(poi_id=cur_kwargs['shopid'])
                 cur_kwargs.update(comment_kwargs)
-                pprint(cur_kwargs)
                 self.process_save_data(**cur_kwargs)
                 # sleep(random.uniform(0.2,0.6))
             self.page += 1
@@ -314,7 +313,14 @@ class WM_Spider:
         ON CONFLICT (id)
         DO UPDATE SET cityname='%(cityname)s',region='%(region)s',shop_score='%(shop_score)f',taste_score='%(taste_score)f',pack_score='%(pack_score)f',delivery_score='%(delivery_score)f',minimum_charge='%(minimum_charge)f',mon_sales='%(mon_sales)d',avg_speed='%(avg_speed)f',business_time='%(business_time)s',special_offer='%(special_offer)s',mark='%(mark)s',update_time='%(update_time)s',url='%(url)s';
         """ % kwargs
-        cur.execute(sql)
+
+        sql2 = """insert into mt_wm (source_data,shopname,shopid,category_tags_l1_name,category_tags_l2_name,category_tags_l3_name,
+        cityname,region,address,address_gps_long,address_gps_lat,shop_score,taste_score,pack_score,delivery_score,comments,popular_dishes,minimum_charge,mon_sales,avg_speed,business_time,
+        special_offer,mark,id,update_time,url) values ('%(source_data)s','%(shopname)s','%(shopid)s','%(category_tags_l1_name)s','%(category_tags_l2_name)s',
+        '%(category_tags_l3_name)s','%(cityname)s','%(region)s','%(address)s','%(address_gps_long)s','%(address_gps_lat)s','%(shop_score)f',
+        %(taste_score)f,%(pack_score)f,%(delivery_score)f,'%(comments)s','%(popular_dishes)s',
+        '%(minimum_charge)f','%(mon_sales)d','%(avg_speed)f','%(business_time)s','%(special_offer)s','%(mark)s','%(id)s','%(update_time)s','%(url)s')""" % kwargs
+        cur.execute(sql2)
         conn.commit()
         self.filter_add(kwargs['shopid'])
         print('插入成功----:', kwargs['shopname'] + '$$$$' + kwargs['shopid'])
@@ -387,7 +393,7 @@ def run():
             mt_wm.work(firstCategoryId='19', secondCategoryId=cate)
 
 if __name__ == '__main__':
-    for i in range(4):
+    for i in range(1):
         t = Thread(target=run)
         t.start()
         sleep(2)
