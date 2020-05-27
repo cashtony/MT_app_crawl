@@ -14,6 +14,9 @@ import json
 from redis import Redis
 from proxy import abuyun,taiyang_proxy
 import logging
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 logging.basicConfig(level=logging.ERROR,
                     format="%(asctime)s %(name)s %(levelname)s %(message)s",
