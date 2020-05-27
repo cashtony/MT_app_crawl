@@ -1,6 +1,6 @@
 import json
 from pprint import pprint
-
+from proxy import taiyang_proxy
 import requests
 
 def pro(response):
@@ -40,9 +40,9 @@ url = 'https://i.waimai.meituan.com/openh5/poi/food?_=1589277696918'
 
 payload = 'mtWmPoiId=1120403554636432&openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490&dpShopId=-1&source=shoplist'
 
-resp = requests.post(url,headers=headers,data=payload)
-json_resp = pro(resp)
-print(json_resp)
+# resp = requests.post(url,headers=headers,data=payload)
+# json_resp = pro(resp)
+# print(json_resp)
 
 # 商家评论页 手机端 用  可能会过期
 url = 'https://i.waimai.meituan.com/openh5/poi/comments?_=1589425001731'
@@ -59,7 +59,7 @@ url = 'https://i.waimai.meituan.com/openh5/channel/kingkongshoplist?_=1589461806
 payload = 'startIndex=1&navigateType=910&firstCategoryId=910&secondCategoryId=100321&geoType=2&platform=3&partner=4&originUrl=https://h5.waimai.meituan.com/waimai/mindex/kingkong?navigateType=910&firstCategoryId=910&secondCategoryId=910&title=%E7%BE%8E%E9%A3%9F&riskLevel=71&optimusCode=10&wm_actual_latitude=22544568&wm_actual_longitude=113949059&openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490'
 
 headers['Cookie'] = 'cityid=30; network=wifi; uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; utm_source=wandoujia; utm_medium=android; utm_term=1000000202; utm_content=861735030994726; wm_order_channel=mtjj; au_trace_key_net=default; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; terminal=i; w_utmz="utm_campaign=(direct)&utm_source=5000&utm_medium=(none)&utm_content=(none)&utm_term=(none)"; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; service-off=0; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024; channelType={%22mtjj%22:%220%22}; w_actual_lat=22546510; w_actual_lng=113948770'
-# resp = requests.post(url,headers=headers,data=payload)
+# resp = requests.post(url,headers=headers,data=payload,verify=False)
 # json_resp = pro(resp)
 # print(resp.text)
 
