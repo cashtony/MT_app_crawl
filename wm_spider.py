@@ -38,7 +38,7 @@ class WM_Spider:
         self.lng = lng
         self.proxy = taiyang_proxy()
         self.index_url = 'https://i.waimai.meituan.com/openh5'
-        headers = {
+        self.headers = {
             'Host': 'i.waimai.meituan.com',
             'Accept': 'application/json',
             'Origin': 'https://h5.waimai.meituan.com',
