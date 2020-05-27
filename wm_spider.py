@@ -179,6 +179,7 @@ class WM_Spider:
         try:
             print(self.proxy)
             response = requests.post(url=url, headers=headers, data=payload,proxies=self.proxy,timeout=10)
+
             print(response.content.decode())
         except:
             self.proxy = taiyang_proxy()

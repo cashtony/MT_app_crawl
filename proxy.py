@@ -36,8 +36,8 @@ def taiyang_proxy():
     if '套餐已用完' in resp.text or '频繁' in resp.text:
         resp = requests.get('http://http.tiqu.qingjuhe.cn/getip?num=1&type=1&pack=50186&port=1&lb=1&pb=4&regions=')
     proxy =  {
-        'http':'http://'+resp.text,
-        'https':'https://'+resp.text
+        'http':'http://'+resp.text.replace('\n',''),
+        'https':'https://'+resp.text.replace('\n','')
     }
     return proxy
 
