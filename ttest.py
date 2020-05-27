@@ -14,11 +14,12 @@ headers = {
     'Host': 'i.waimai.meituan.com',
     'Accept': 'application/json',
     'Origin': 'https://h5.waimai.meituan.com',
-    'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0.1; Redmi Note 3 Build/MMB29M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.91 Mobile Safari/537.36 TitansX/11.19.6 KNB/1.2.0 android/6.0.1 mt/com.sankuai.meituan/10.0.202 App/10120/10.0.202 MeituanGroup/10.0.202',
+    # 'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0.1; Redmi Note 3 Build/MMB29M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/68.0.3440.91 Mobile Safari/537.36 TitansX/11.19.6 KNB/1.2.0 android/6.0.1 mt/com.sankuai.meituan/10.0.202 App/10120/10.0.202 MeituanGroup/10.0.202',
+    'User-Agent':'AiMeiTuan /Meizu-5.1-MX4-1920x1152-480-10.8.404-1000080404-862095026057122-meizu4',
     'Referer': 'https://h5.waimai.meituan.com/waimai/mindex/menu?dpShopId=&mtShopId=1112840116809435&utm_source=wandoujia&channel=mtjj&source=shoplist&initialLat=22.544568&initialLng=113.949059&actualLat=22.544568&actualLng=113.949059',
     'Accept-Encoding': 'gzip, deflate',
     'Accept-Language': 'zh-CN,en-US;q=0.9',
-    'Cookie': 'cityid=30; uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; utm_medium=android; utm_term=1000000202; utm_content=861735030994726; w_actual_lat=22544568; w_actual_lng=113949059',
+    'Cookie': 'cityid=30; network=wifi; utm_source=meizu4; utm_medium=android; utm_term=1000000202; utm_content=862095026057122; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024; wm_order_channel=mtjj; au_trace_key_net=default; openh5_uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC; channelType=%7b%22mtjj%22%3a%220%22%7d;',
     'X-Requested-With': 'com.sankuai.meituan',
     'Content-Type': 'application/x-www-form-urlencoded',
     'Connection': 'keep-alive',
@@ -31,27 +32,27 @@ url = 'https://i.waimai.meituan.com/openh5/poi/food?_=1589277696918'
 
 ### 商家信息页 手机端 用
 url = 'https://i.waimai.meituan.com/openh5/poi/info?_=1589277696918'
-payload = 'mtWmPoiId=939443697603857&openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490'
-headers['Cookie'] = 'cityid=30; network=wifi; uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; utm_source=wandoujia; utm_medium=android; utm_term=1000000202; utm_content=861735030994726; wm_order_channel=mtjj; au_trace_key_net=default; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; terminal=i; w_utmz="utm_campaign=(direct)&utm_source=5000&utm_medium=(none)&utm_content=(none)&utm_term=(none)"; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; service-off=0; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024; channelType={%22mtjj%22:%220%22}; w_actual_lat=22546510; w_actual_lng=113948770'
-# resp = requests.post(url,headers=headers,data=payload)
+payload = 'mtWmPoiId=939443697603857&openh5_uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC'
+# headers['Cookie'] = 'cityid=30; network=wifi; uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC; utm_source=wandoujia; utm_medium=android; utm_term=1000000202; utm_content=861735030994726; wm_order_channel=mtjj; au_trace_key_net=default; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; terminal=i; w_utmz="utm_campaign=(direct)&utm_source=5000&utm_medium=(none)&utm_content=(none)&utm_term=(none)"; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; service-off=0; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024; channelType={%22mtjj%22:%220%22}; w_actual_lat=22546510; w_actual_lng=113948770'
+# resp = requests.post(url,headers=headers,data=payload,verify=False)
 # json_resp = pro(resp)
 # pprint(json_resp)
 
 ### 最简化参数  商品 用
 url = 'https://i.waimai.meituan.com/openh5/poi/food?_=1589277696918'
 
-payload = 'mtWmPoiId=1120403554636432&openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490&dpShopId=-1&source=shoplist'
+payload = 'mtWmPoiId=939443697603857&openh5_uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC&dpShopId=-1&source=shoplist'
 
-# resp = requests.post(url,headers=headers,data=payload)
+# resp = requests.post(url,headers=headers,data=payload,verify=False)
 # json_resp = pro(resp)
 # print(json_resp)
 
 # 商家评论页 手机端 用  可能会过期
 url = 'https://i.waimai.meituan.com/openh5/poi/comments?_=1589425001731'
-headers['Cookie'] = 'cityid=30; network=wifi; uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; utm_source=wandoujia; utm_medium=android; utm_term=1000000202; utm_content=861735030994726; wm_order_channel=mtjj; au_trace_key_net=default; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; terminal=i; w_utmz="utm_campaign=(direct)&utm_source=5000&utm_medium=(none)&utm_content=(none)&utm_term=(none)"; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; service-off=0; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024; channelType={%22mtjj%22:%220%22}; w_actual_lat=22546510; w_actual_lng=113948770'
+headers['Cookie'] = 'cityid=30; network=wifi; utm_medium=android; utm_term=1000000202; utm_content=862095026057122; _lxsdk_cuid=1725440c0da2-08336aca1-5a10162d-3c000-1725440c0dc62; _lxsdk=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC; _lxsdk_s=1725440c0e0-f28-0db-5e0%7C-1%7CNaN;'
 
-payload = 'shopId=0&mtWmPoiId=1124243255373647&startIndex=0&platform=3&partner=4&originUrl=https%3A%2F%2Fh5.waimai.meituan.com%2Fwaimai%2Fmindex%2Fmenu%3FdpShopId%3D%26mtShopId%3D891876934366856%26utm_source%3Dwandoujia%26channel%3Dmtjj%26source%3Dshoplist%26initialLat%3D%26initialLng%3D%26actualLat%3D22.544568%26actualLng%3D113.949059&riskLevel=71&optimusCode=10&openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490'
-# resp = requests.post(url,headers=headers,data=payload)
+payload = 'shopId=0&mtWmPoiId=943382183119710&startIndex=0&platform=3&partner=4&originUrl=https%3A%2F%2Fh5.waimai.meituan.com%2Fwaimai%2Fmindex%2Fmenu%3FdpShopId%3D%26mtShopId%3D891876934366856%26utm_source%3Dwandoujia%26channel%3Dmtjj%26source%3Dshoplist%26initialLat%3D%26initialLng%3D%26actualLat%3D22.544568%26actualLng%3D113.949059&riskLevel=71&optimusCode=10&openh5_uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC'
+# resp = requests.post(url,headers=headers,data=payload,verify=False)
 # resp_json = pro(resp)
 # pprint(resp_json)
 
@@ -60,10 +61,10 @@ url = 'https://i.waimai.meituan.com/openh5/channel/kingkongshoplist?_=1589461806
 
 payload = 'startIndex=1&navigateType=910&firstCategoryId=910&secondCategoryId=100321&geoType=2&platform=3&partner=4&originUrl=https://h5.waimai.meituan.com/waimai/mindex/kingkong?navigateType=910&firstCategoryId=910&secondCategoryId=910&title=%E7%BE%8E%E9%A3%9F&riskLevel=71&optimusCode=10&wm_actual_latitude=22544568&wm_actual_longitude=113949059&openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490'
 
-headers['Cookie'] = 'cityid=30; network=wifi; uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; utm_source=wandoujia; utm_medium=android; utm_term=1000000202; utm_content=861735030994726; wm_order_channel=mtjj; au_trace_key_net=default; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; terminal=i; w_utmz="utm_campaign=(direct)&utm_source=5000&utm_medium=(none)&utm_content=(none)&utm_term=(none)"; openh5_uuid=450940DF938B12BD8AAC598D8CF4678D69BDD48C75BE2CD34A3C20CA525B3490; service-off=0; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024; channelType={%22mtjj%22:%220%22}; w_actual_lat=22546510; w_actual_lng=113948770'
-resp = requests.post(url,headers=headers,data=payload,verify=False)
-json_resp = pro(resp)
-print(resp.text)
+# headers['Cookie'] = 'cityid=30; network=wifi; uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC; utm_source=wandoujia; utm_medium=android; utm_term=1000000202; utm_content=862095026057122; wm_order_channel=mtjj; au_trace_key_net=default; openh5_uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC; terminal=i; w_utmz="utm_campaign=(direct)&utm_source=5000&utm_medium=(none)&utm_content=(none)&utm_term=(none)"; openh5_uuid=E1BD0ABE0A4A8F012F3E7C3D393E13D4598E05C2BFE038A1F57A72FD44F391FC; service-off=0; utm_campaign=AgroupBgroupC0E0Ghomepage_category1_394__a1__c-1024; channelType={%22mtjj%22:%220%22}; w_actual_lat=22546510; w_actual_lng=113948770'
+# resp = requests.post(url,headers=headers,data=payload,verify=False)
+# json_resp = pro(resp)
+# print(resp.text)
 
 
 
